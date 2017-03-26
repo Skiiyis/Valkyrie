@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">@color/purplePrimary</color>
+    <color name="colorPrimaryDark">@color/purplePrimary</color>
+    <color name="colorAccent">@color/purplePrimary</color>
+    <color name="colorImageLoadingPlaceHolder">@color/grayF5F5F5</color>
+
+    <color name="backgroundWritePrimary">@color/grayF5F5F5</color>
+    <color name="backgroundWriteSecondary">@android:color/white</color>
+
+    <color name="purplePrimary">#9900FF</color>
+    <color name="grayF5F5F5">#F5F5F5</color>
+</resources>
