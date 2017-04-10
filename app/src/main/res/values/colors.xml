@@ -11,6 +11,8 @@
     <color name="purplePrimary">#9900FF</color>
     <color name="grayF5F5F5">#F5F5F5</color>
     <color name="black333">#333</color>
+    <color name="gray_eee">#eee</color>
 
     <color name="fontPrimary">@color/black333</color>
+    <color name="color_divider">@color/gray_eee</color>
 </resources>

@@ -99,7 +99,7 @@ public class ZhiHuViewModel extends BaseViewModel<ViewRecycleViewWrapper, ZhiHuN
             holder.titleTextView.setText(story.getTitle());
             List<String> images = story.getImages();
             if (images != null && images.size() != 0) {
-                holder.thumbailImageView.load(images.get(0));
+                holder.thumbailsImageView.load(images.get(0));
             }
             holder.titleTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -173,12 +173,12 @@ public class ZhiHuViewModel extends BaseViewModel<ViewRecycleViewWrapper, ZhiHuN
     private static final class ZhiHuStoryViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView titleTextView;
-        private final PlusImageView thumbailImageView;
+        private final PlusImageView thumbailsImageView;
 
         public ZhiHuStoryViewHolder(View itemView) {
             super(itemView);
             titleTextView = (TextView) itemView.findViewById(R.id.tv_title);
-            thumbailImageView = (PlusImageView) itemView.findViewById(R.id.iv_thumbnail);
+            thumbailsImageView = (PlusImageView) itemView.findViewById(R.id.iv_thumbnail);
         }
     }
 }
