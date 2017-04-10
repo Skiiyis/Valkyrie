@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created by hasee on 2017/3/11.
  */
-public abstract class BaseViewModel<V extends BaseViewDelegate, M extends Serializable> {
+public abstract class BaseViewModel<V extends BaseViewWrapper, M extends Serializable> {
 
     protected final V view;
 

@@ -10,4 +10,7 @@
 
     <color name="purplePrimary">#9900FF</color>
     <color name="grayF5F5F5">#F5F5F5</color>
+    <color name="black333">#333</color>
+
+    <color name="fontPrimary">@color/black333</color>
 </resources>

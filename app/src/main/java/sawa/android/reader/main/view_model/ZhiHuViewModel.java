@@ -1,4 +1,4 @@
-package sawa.android.reader.main.ViewModel;
+package sawa.android.reader.main.view_model;
 
 import android.graphics.Color;
 import android.support.v4.view.PagerAdapter;
@@ -19,16 +19,16 @@ import sawa.android.reader.R;
 import sawa.android.reader.common.BaseViewModel;
 import sawa.android.reader.common.PlusImageView;
 import sawa.android.reader.global.Application;
-import sawa.android.reader.main.ViewDelegate.ZhiHuViewDelegate;
+import sawa.android.reader.main.view_wrapper.ViewRecycleViewWrapper;
 import sawa.android.reader.main.bean.ZhiHuNewsLatestResponse;
 import sawa.android.reader.zhihu.activity.ZhiHuWebViewActivity;
 
 /**
  * Created by hasee on 2017/3/11.
  */
-public class ZhiHuViewModel extends BaseViewModel<ZhiHuViewDelegate, ZhiHuNewsLatestResponse> {
+public class ZhiHuViewModel extends BaseViewModel<ViewRecycleViewWrapper, ZhiHuNewsLatestResponse> {
 
-    public ZhiHuViewModel(ZhiHuViewDelegate view) {
+    public ZhiHuViewModel(ViewRecycleViewWrapper view) {
         super(view);
     }
 

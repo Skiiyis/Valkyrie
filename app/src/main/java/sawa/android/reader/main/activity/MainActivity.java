@@ -13,13 +13,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
 
 import sawa.android.reader.R;
 import sawa.android.reader.common.BaseActivity;
+import sawa.android.reader.common.BaseView;
 import sawa.android.reader.common.LifeCycleViewHelper;
 import sawa.android.reader.global.Application;
+import sawa.android.reader.main.view.DouBanFMView;
 import sawa.android.reader.main.view.ZhiHuView;
 
 public class MainActivity extends BaseActivity
@@ -106,7 +109,7 @@ public class MainActivity extends BaseActivity
         private WeakReference<MainActivity> activityRef;
 
         public MainFragmentAdapter(MainActivity activity) {
-            activityRef = new WeakReference<MainActivity>(activity);
+            activityRef = new WeakReference<>(activity);
         }
 
         private static final String[] title = new String[]{"知乎", "FM", "乐子", "Android"};
@@ -123,12 +126,24 @@ public class MainActivity extends BaseActivity
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            ZhiHuView zhiHuView = new ZhiHuView(Application.get());
-            if (activityRef.get() != null) {
-                activityRef.get().helper.addLifeCycleView(zhiHuView);
+            BaseView childView = null;
+            switch (position) {
+                case 0:
+                    childView = new ZhiHuView(Application.get());
+                    break;
+                case 1:
+                    childView = new DouBanFMView(Application.get());
+                    break;
+                default:
+                    TextView child = new TextView(Application.get());
+                    container.addView(child);
+                    return child;
             }
-            container.addView(zhiHuView);
-            return zhiHuView;
+            if (activityRef.get() != null) {
+                activityRef.get().helper.addLifeCycleView(childView);
+            }
+            container.addView(childView);
+            return childView;
         }
 
         @Override

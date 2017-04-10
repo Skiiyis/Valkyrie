@@ -10,8 +10,8 @@ import rx.Subscriber;
 import sawa.android.reader.R;
 import sawa.android.reader.common.BaseView;
 import sawa.android.reader.http.ZhiHuApi;
-import sawa.android.reader.main.ViewDelegate.ZhiHuViewDelegate;
-import sawa.android.reader.main.ViewModel.ZhiHuViewModel;
+import sawa.android.reader.main.view_wrapper.ViewRecycleViewWrapper;
+import sawa.android.reader.main.view_model.ZhiHuViewModel;
 import sawa.android.reader.main.bean.ZhiHuNewsLatestResponse;
 
 /**
@@ -19,7 +19,7 @@ import sawa.android.reader.main.bean.ZhiHuNewsLatestResponse;
  */
 public class ZhiHuView extends BaseView {
 
-    private ZhiHuViewDelegate zhiHuViewDelegate;
+    private ViewRecycleViewWrapper viewRecycleViewDelegate;
     private ZhiHuViewModel zhiHuViewModel;
 
     public ZhiHuView(Context context) {
@@ -36,8 +36,8 @@ public class ZhiHuView extends BaseView {
 
     @Override
     public void onInflate(View contentView) {
-        zhiHuViewDelegate = new ZhiHuViewDelegate(contentView);
-        zhiHuViewModel = new ZhiHuViewModel(zhiHuViewDelegate);
+        viewRecycleViewDelegate = new ViewRecycleViewWrapper(contentView);
+        zhiHuViewModel = new ZhiHuViewModel(viewRecycleViewDelegate);
         ZhiHuApi.newsLatest(new NewsLatestRequest(this));
     }
 
@@ -47,7 +47,7 @@ public class ZhiHuView extends BaseView {
 
     @Override
     protected int getLayoutId() {
-        return R.layout.view_zhihu;
+        return R.layout.view_recycle_view;
     }
 
     /**
