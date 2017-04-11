@@ -7,9 +7,9 @@
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:padding="15dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:padding="15dp">
 
         <sawa.android.reader.common.PlusImageView
             android:id="@+id/pv_cover"
@@ -17,16 +17,34 @@
             android:layout_height="60dp"
             sawa:circular="true" />
 
-        <TextView
-            android:id="@+id/tv_text"
+        <LinearLayout
             android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="match_parent"
             android:layout_marginLeft="@dimen/margin_lager"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:text="艺术家"
-            android:textColor="@color/fontPrimary"
-            android:textSize="@dimen/text_normal" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="艺术家"
+                android:textColor="@color/font_primary"
+                android:textSize="@dimen/text_normal" />
+
+            <TextView
+                android:id="@+id/tv_collected_count"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="收藏的人数"
+                android:textColor="@color/font_secondary"
+                android:textSize="@dimen/text_little" />
+        </LinearLayout>
+
 
         <sawa.android.reader.common.PlusImageView
             android:id="@+id/pv_status"

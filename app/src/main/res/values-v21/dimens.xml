@@ -1,0 +1,4 @@
+<resources>
+    <dimen name="home_icon_height">32dp</dimen>
+    <dimen name="home_icon_width">32dp</dimen>
+</resources>

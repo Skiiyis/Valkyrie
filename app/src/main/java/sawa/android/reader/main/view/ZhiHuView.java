@@ -19,7 +19,7 @@ import sawa.android.reader.main.bean.ZhiHuNewsLatestResponse;
  */
 public class ZhiHuView extends BaseView {
 
-    private ViewRecycleViewWrapper viewRecycleViewDelegate;
+    private ViewRecycleViewWrapper viewRecycleViewWrapper;
     private ZhiHuViewModel zhiHuViewModel;
 
     public ZhiHuView(Context context) {
@@ -36,8 +36,8 @@ public class ZhiHuView extends BaseView {
 
     @Override
     public void onInflate(View contentView) {
-        viewRecycleViewDelegate = new ViewRecycleViewWrapper(contentView);
-        zhiHuViewModel = new ZhiHuViewModel(viewRecycleViewDelegate);
+        viewRecycleViewWrapper = new ViewRecycleViewWrapper(contentView);
+        zhiHuViewModel = new ZhiHuViewModel(viewRecycleViewWrapper);
         ZhiHuApi.newsLatest(new NewsLatestRequest(this));
     }
 

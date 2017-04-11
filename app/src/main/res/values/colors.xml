@@ -1,18 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">@color/purplePrimary</color>
-    <color name="colorPrimaryDark">@color/purplePrimary</color>
-    <color name="colorAccent">@color/purplePrimary</color>
-    <color name="colorImageLoadingPlaceHolder">@color/grayF5F5F5</color>
+    <color name="color_primary">@color/blue_primary</color>
+    <color name="color_primary_dark">@color/blue_primary</color>
+    <color name="color_accent">@color/yellow_accent</color>
+    <color name="color_image_loading_place_holder">@color/gray_F5F5F5</color>
 
-    <color name="backgroundWritePrimary">@color/grayF5F5F5</color>
-    <color name="backgroundWriteSecondary">@android:color/white</color>
+    <color name="background_write_primary">@color/gray_F5F5F5</color>
+    <color name="background_write_secondary">@android:color/white</color>
 
-    <color name="purplePrimary">#9900FF</color>
-    <color name="grayF5F5F5">#F5F5F5</color>
-    <color name="black333">#333</color>
-    <color name="gray_eee">#eee</color>
+    <color name="yellow_accent">#FFC107</color>
+    <color name="blue_primary">#00BCD5</color>
+    <color name="gray_F5F5F5">#F5F5F5</color>
+    <color name="black_333">#333</color>
+    <color name="black_666">#666</color>
+    <color name="black_999">#999</color>
+    <color name="gray_EEE">#EEE</color>
+    <color name="gray_D8D8D8">#D8D8D8</color>
 
-    <color name="fontPrimary">@color/black333</color>
-    <color name="color_divider">@color/gray_eee</color>
+    <color name="write_pure">@android:color/white</color>
+
+    <color name="font_primary">@color/black_333</color>
+    <color name="font_secondary">@color/black_999</color>
+
+    <color name="color_divider">@color/gray_EEE</color>
 </resources>

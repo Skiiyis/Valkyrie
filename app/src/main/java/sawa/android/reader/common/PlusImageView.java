@@ -45,43 +45,63 @@ public class PlusImageView extends ImageView {
         super(context, attrs, defStyleAttr);
     }
 
-    public PlusImageView load(String url, int drawableResId) {
-        Picasso.with(Application.get()).load(url).placeholder(drawableResId).error(R.drawable.image_loading_error).into(this);
+    public PlusImageView load(String url, int placeholderDrawableResId, int errorDrawableResId) {
+        Picasso.with(Application.get()).load(url).placeholder(placeholderDrawableResId).error(errorDrawableResId).into(this);
         return this;
     }
 
-    public PlusImageView load(File file, int drawableResId) {
-        Picasso.with(Application.get()).load(file).placeholder(drawableResId).error(R.drawable.image_loading_error).into(this);
+    public PlusImageView load(File file, int placeholderDrawableResId, int errorDrawableResId) {
+        Picasso.with(Application.get()).load(file).placeholder(placeholderDrawableResId).error(errorDrawableResId).into(this);
         return this;
     }
 
-    public PlusImageView load(int resId, int drawableResId) {
-        Picasso.with(Application.get()).load(resId).placeholder(drawableResId).error(R.drawable.image_loading_error).into(this);
+    public PlusImageView load(int resId, int placeholderDrawableResId, int errorDrawableResId) {
+        Picasso.with(Application.get()).load(resId).placeholder(placeholderDrawableResId).error(errorDrawableResId).into(this);
         return this;
     }
 
-    public PlusImageView load(Uri uri, int drawableResId) {
-        Picasso.with(Application.get()).load(uri).placeholder(drawableResId).error(R.drawable.image_loading_error).into(this);
+    public PlusImageView load(Uri uri, int placeholderDrawableResId, int errorDrawableResId) {
+        Picasso.with(Application.get()).load(uri).placeholder(placeholderDrawableResId).error(errorDrawableResId).into(this);
+        return this;
+    }
+
+    public PlusImageView load(String url, int placeholderDrawableResId) {
+        load(url, placeholderDrawableResId, R.drawable.image_loading_error);
+        return this;
+    }
+
+    public PlusImageView load(File file, int placeholderDrawableResId) {
+        load(file, placeholderDrawableResId, R.drawable.image_loading_error);
+        return this;
+    }
+
+    public PlusImageView load(int resId, int placeholderDrawableResId) {
+        load(resId, placeholderDrawableResId, R.drawable.image_loading_error);
+        return this;
+    }
+
+    public PlusImageView load(Uri uri, int placeholderDrawableResId) {
+        load(uri, placeholderDrawableResId, R.drawable.image_loading_error);
         return this;
     }
 
     public PlusImageView load(String url) {
-        Picasso.with(Application.get()).load(url).placeholder(R.drawable.image_loading_place_holder).error(R.drawable.image_loading_error).into(this);
+        load(url, R.drawable.image_loading_place_holder);
         return this;
     }
 
     public PlusImageView load(File file) {
-        Picasso.with(Application.get()).load(file).placeholder(R.drawable.image_loading_place_holder).error(R.drawable.image_loading_error).into(this);
+        load(file, R.drawable.image_loading_place_holder);
         return this;
     }
 
     public PlusImageView load(int resId) {
-        Picasso.with(Application.get()).load(resId).placeholder(R.drawable.image_loading_place_holder).error(R.drawable.image_loading_error).into(this);
+        load(resId, R.drawable.image_loading_place_holder);
         return this;
     }
 
     public PlusImageView load(Uri uri) {
-        Picasso.with(Application.get()).load(uri).placeholder(R.drawable.image_loading_place_holder).error(R.drawable.image_loading_error).into(this);
+        load(uri, R.drawable.image_loading_place_holder);
         return this;
     }
 

@@ -27,7 +27,6 @@ import sawa.android.reader.zhihu.bean.ZhiHuNewsDetailResponse;
 public class ZhiHuWebViewActivity extends WebViewActivity {
 
     private WebView contentWebView;
-    private AppBarLayout appBar;
     private CollapsingToolbarLayout toolbarLayout;
     private PlusImageView pvHeader;
 
@@ -39,7 +38,6 @@ public class ZhiHuWebViewActivity extends WebViewActivity {
         String id = getIntent().getStringExtra("id");
         ZhiHuApi.newsDetail(new NewsDetailRequest(this), id);
 
-        appBar = (AppBarLayout) findViewById(R.id.app_bar);
         toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
         pvHeader = (PlusImageView) findViewById(R.id.pv_header);
     }
@@ -62,6 +60,11 @@ public class ZhiHuWebViewActivity extends WebViewActivity {
         contentWebView.loadData(html, "text/html; charset=UTF-8", null);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        contentWebView.destroy();
+    }
 
     /**
      * 请求知乎日报内容

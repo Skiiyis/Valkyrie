@@ -8,7 +8,6 @@ import android.view.View;
  */
 public abstract class BaseViewWrapper extends RecyclerView.ViewHolder {
 
-
     public BaseViewWrapper(View rootView) {
         super(rootView);
     }

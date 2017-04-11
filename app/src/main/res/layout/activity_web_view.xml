@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context=".zhihu.activity.ZhiHuWebViewActivity">
+    android:fitsSystemWindows="true">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_collapseParallaxMultiplier="0.2"
         android:fitsSystemWindows="true"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:layout_collapseParallaxMultiplier="0.2">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/toolbar_layout"
@@ -24,12 +22,12 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <sawa.android.reader.common.PlusImageView
-                android:scaleType="centerCrop"
                 android:id="@+id/pv_header"
                 android:layout_width="match_parent"
+                android:layout_height="300dp"
                 android:fitsSystemWindows="true"
-                app:layout_collapseMode="parallax"
-                android:layout_height="300dp" />
+                android:scaleType="centerCrop"
+                app:layout_collapseMode="parallax" />
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -44,8 +42,8 @@
     <include layout="@layout/content_web_view" />
 
     <android.support.design.widget.FloatingActionButton
-        style="@android:color/holo_red_light"
         android:id="@+id/fab"
+        style="@android:color/holo_red_light"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"

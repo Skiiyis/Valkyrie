@@ -1,18 +1,12 @@
 package sawa.android.reader.main.activity;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
@@ -24,81 +18,59 @@ import sawa.android.reader.common.LifeCycleViewHelper;
 import sawa.android.reader.global.Application;
 import sawa.android.reader.main.view.DouBanFMView;
 import sawa.android.reader.main.view.ZhiHuView;
+import sawa.android.reader.main.view_wrapper.MainActivityViewWrapper;
 
-public class MainActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends BaseActivity {
 
     private LifeCycleViewHelper helper = new LifeCycleViewHelper();
+    private int currentChecked = 0;
+
+    /*
+    int[][] states = new int[][]{{-android.R.attr.state_checked, android.R.attr.state_checked}};
+    private int[] colors = new int[]{ContextCompat.getColor(Application.get(), R.color.gray_D8D8D8), ContextCompat.getColor(Application.get(), R.color.color_primary)};
+    */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-       /* Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);*/
+        final MainActivityViewWrapper mainActivityViewWrapper = new MainActivityViewWrapper(View.inflate(this, R.layout.activity_main, null));
+        setContentView(mainActivityViewWrapper.getRootView());
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mainActivityViewWrapper.containerViewPager().setAdapter(new MainFragmentAdapter(this));
+        mainActivityViewWrapper.buttonRadioGroup().setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                for (int j = 0; j < radioGroup.getChildCount(); j++) {
+                    if (((RadioButton) radioGroup.getChildAt(j)).isChecked()) {
+                        mainActivityViewWrapper.containerViewPager().setCurrentItem(j);
+                        currentChecked = j;
+                        break;
+                    }
+                }
             }
         });
+        ((RadioButton) mainActivityViewWrapper.buttonRadioGroup().getChildAt(currentChecked)).setChecked(true);
+        mainActivityViewWrapper.containerViewPager().addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                /*
+                int[] color = new int[]{colors[0], ColorUtil.centerColor(colors[0], colors[1], positionOffsetPixels)};
+                ColorStateList colorStateList = new ColorStateList(states, color);
+                ((RadioButton) mainActivityViewWrapper.buttonRadioGroup().getChildAt(currentChecked)).setCompoundDrawableTintList(colorStateList);
+                */
+            }
 
-        /*DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();*/
+            @Override
+            public void onPageSelected(int position) {
+                ((RadioButton) mainActivityViewWrapper.buttonRadioGroup().getChildAt(position)).setChecked(true);
+                currentChecked = position;
+            }
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+            @Override
+            public void onPageScrollStateChanged(int state) {
 
-        TabLayout mainTabLayout = findView(R.id.tl_tablayout);
-        ViewPager mainViewPager = findView(R.id.vp_main_container);
-
-        mainTabLayout.setupWithViewPager(mainViewPager);
-        mainViewPager.setAdapter(new MainFragmentAdapter(this));
-    }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.nav_fav) {
-        } else if (id == R.id.nav_setting) {
-        } else if (id == R.id.nav_night_mode) {
-        } else if (id == R.id.nav_author) {
-        }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
+            }
+        });
     }
 
     /**

@@ -13,10 +13,10 @@ import sawa.android.reader.main.view_model.DouBanFMViewModel;
  */
 public class DouBanFMViewWrapper extends BaseViewWrapper {
 
-    private DouBanFMViewModel viewModel;
     private PlusImageView coverImageView;
     private PlusImageView statusImageView;
-    private TextView textTextView;
+    private TextView titleTextView;
+    private TextView countTextView;
 
     public DouBanFMViewWrapper(View rootView) {
         super(rootView);
@@ -36,18 +36,17 @@ public class DouBanFMViewWrapper extends BaseViewWrapper {
         return statusImageView;
     }
 
-    public TextView textTextView() {
-        if (textTextView == null) {
-            textTextView = (TextView) getRootView().findViewById(R.id.tv_text);
+    public TextView titleTextView() {
+        if (titleTextView == null) {
+            titleTextView = (TextView) getRootView().findViewById(R.id.tv_text);
         }
-        return textTextView;
+        return titleTextView;
     }
 
-    public DouBanFMViewModel getViewModel() {
-        return viewModel;
-    }
-
-    public void setViewModel(DouBanFMViewModel viewModel) {
-        this.viewModel = viewModel;
+    public TextView collectedCountTextView(){
+        if (countTextView == null) {
+            countTextView = (TextView) getRootView().findViewById(R.id.tv_collected_count);
+        }
+        return countTextView;
     }
 }

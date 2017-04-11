@@ -1,21 +1,22 @@
 package sawa.android.reader.main.view_model;
 
 import sawa.android.reader.common.BaseViewModel;
-import sawa.android.reader.main.bean.DouBanFMChannel;
+import sawa.android.reader.main.bean.DouBanFMSongList;
 import sawa.android.reader.main.view_wrapper.DouBanFMViewWrapper;
 
 /**
  * Created by hasee on 2017/3/26.
  */
-public class DouBanFMViewModel extends BaseViewModel<DouBanFMViewWrapper, DouBanFMChannel.Channel> {
+public class DouBanFMViewModel extends BaseViewModel<DouBanFMViewWrapper, DouBanFMSongList> {
 
     public DouBanFMViewModel(DouBanFMViewWrapper view) {
         super(view);
     }
 
     @Override
-    public void bind(DouBanFMChannel.Channel model) {
+    public void bind(DouBanFMSongList model) {
         view.coverImageView().load(model.getCover());
-        view.textTextView().setText(model.getName());
+        view.titleTextView().setText(model.getTitle());
+        view.collectedCountTextView().setText(model.getCollected_count() + "人已收藏");
     }
 }
