@@ -28,6 +28,7 @@ import sawa.android.reader.main.bean.DouBanFMSongList;
 import sawa.android.reader.main.view_model.DouBanFMViewModel;
 import sawa.android.reader.main.view_wrapper.DouBanFMViewWrapper;
 import sawa.android.reader.main.view_wrapper.ViewRecycleViewWrapper;
+import sawa.android.reader.util.LogUtil;
 
 /**
  * Created by hasee on 2017/3/26.
@@ -114,8 +115,7 @@ public class DouBanFMMainFragment extends BaseFragment {
 
         @Override
         public void onError(Throwable e) {
-            e.printStackTrace();
-            LogUtils.e(e.getMessage());
+            LogUtil.e(e);
         }
 
         @Override
@@ -139,7 +139,7 @@ public class DouBanFMMainFragment extends BaseFragment {
 
         @Override
         public void onError(Throwable e) {
-            LogUtils.e(e.getMessage());
+            LogUtil.e(e);
         }
 
         @Override

@@ -1,17 +1,14 @@
 package sawa.android.reader.http;
 
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.functions.Function;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import sawa.android.reader.common.BaseApi;
 import sawa.android.reader.douban.bean.DouBanFMSongListDetail;
 import sawa.android.reader.main.bean.DouBanFMChannel;
 import sawa.android.reader.main.bean.DouBanFMSongList;
@@ -19,20 +16,12 @@ import sawa.android.reader.main.bean.DouBanFMSongList;
 /**
  * Created by hasee on 2017/3/26.
  */
-public class DouBanFMApi {
+public class DouBanFMApi extends BaseApi {
 
     public static final String HOST = "https://api.douban.com/v2/fm/";
 
-    private static Retrofit retrofit() {
-        return new Retrofit.Builder()
-                .baseUrl(HOST)
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build();
-    }
-
     public static Observable<List<DouBanFMChannel>> channelList() {
-        return retrofit().create(ChannelListService.class).channelList()
+        return retrofit(HOST).create(ChannelListService.class).channelList()
                 .map(new Function<DouBanFMChannelsResponse, List<DouBanFMChannel>>() {
                     @Override
                     public List<DouBanFMChannel> apply(DouBanFMChannelsResponse response) throws Exception {
@@ -44,7 +33,7 @@ public class DouBanFMApi {
     }
 
     public static Observable<List<DouBanFMSongList>> songList() {
-        return retrofit().create(SongListService.class).songList().map(new Function<DouBanFMSongListResponse, List<DouBanFMSongList>>() {
+        return retrofit(HOST).create(SongListService.class).songList().map(new Function<DouBanFMSongListResponse, List<DouBanFMSongList>>() {
             @Override
             public List<DouBanFMSongList> apply(DouBanFMSongListResponse response) throws Exception {
                 final List<DouBanFMSongList> songLists = new ArrayList<>();
@@ -57,7 +46,7 @@ public class DouBanFMApi {
     }
 
     public static Observable<DouBanFMSongListDetail> songListDetail(String songListId) {
-        return retrofit().create(SongListDetailService.class).songListDetail(songListId);
+        return retrofit(HOST).create(SongListDetailService.class).songListDetail(songListId);
     }
 
     /**

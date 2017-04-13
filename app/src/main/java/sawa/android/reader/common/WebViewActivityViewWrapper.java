@@ -25,7 +25,7 @@ public class WebViewActivityViewWrapper extends BaseViewWrapper {
         return (PlusImageView) rootView().findViewById(R.id.pv_header);
     }
 
-    public CollapsingToolbarLayout toolBarLayout() {
+    public CollapsingToolbarLayout toolbarLayout() {
         return (CollapsingToolbarLayout) rootView().findViewById(R.id.toolbar_layout);
     }
 

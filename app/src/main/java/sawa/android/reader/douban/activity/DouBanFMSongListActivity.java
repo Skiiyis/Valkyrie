@@ -5,18 +5,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.blankj.utilcode.utils.LogUtils;
 import com.blankj.utilcode.utils.ToastUtils;
+import com.google.gson.Gson;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -24,23 +27,49 @@ import io.reactivex.schedulers.Schedulers;
 import sawa.android.reader.R;
 import sawa.android.reader.common.BaseActivity;
 import sawa.android.reader.common.DefaultObserver;
+import sawa.android.reader.db.CacheManager;
 import sawa.android.reader.douban.bean.DouBanFMSongListDetail;
 import sawa.android.reader.douban.view_model.DouBanFMSongListDetailItemViewModel;
 import sawa.android.reader.douban.view_wrapper.DouBanFMSongListActivityViewWrapper;
 import sawa.android.reader.douban.view_wrapper.DouBanFMSongListDetailItemViewWrapper;
 import sawa.android.reader.global.Application;
 import sawa.android.reader.http.DouBanFMApi;
+import sawa.android.reader.util.LogUtil;
 
 /**
  * 豆瓣歌单详情
  */
 public class DouBanFMSongListActivity extends BaseActivity implements View.OnClickListener {
 
-    private DouBanFMSongListActivityViewWrapper activityViewWrapper;
+    private DouBanFMSongListActivityViewWrapper viewWrapper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Observable<DouBanFMSongListDetail> observable = Observable.just(getIntent().getStringExtra("songListId"))
+                .observeOn(Schedulers.io())
+                .flatMap(new Function<String, Observable<DouBanFMSongListDetail>>() {
+                    @Override
+                    public Observable<DouBanFMSongListDetail> apply(String s) throws Exception {
+                        final String cache = CacheManager.INSTANCE.cache("songListId" + s);
+                        if (!TextUtils.isEmpty(cache)) {
+                            return Observable.create(new ObservableOnSubscribe<DouBanFMSongListDetail>() {
+                                @Override
+                                public void subscribe(ObservableEmitter<DouBanFMSongListDetail> e) throws Exception {
+                                    DouBanFMSongListDetail detail = new Gson().fromJson(cache, DouBanFMSongListDetail.class);
+                                    e.onNext(detail);
+                                }
+                            });
+                        }
+                        return null;
+                    }
+                });
+
+        if (observable != null) {
+            observable.observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new DouBanFMSongListDetailObserver(this));
+        }
 
         Observable.just(getIntent().getStringExtra("songListId"))
                 .doOnNext(new Consumer<String>() {
@@ -56,17 +85,23 @@ public class DouBanFMSongListActivity extends BaseActivity implements View.OnCli
                         return DouBanFMApi.songListDetail(songListId);
                     }
                 })
+                .doOnNext(new Consumer<DouBanFMSongListDetail>() {
+                    @Override
+                    public void accept(DouBanFMSongListDetail detail) throws Exception {
+                        CacheManager.INSTANCE.cache("songListId" + detail.getId(), new Gson().toJson(detail));
+                    }
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new DouBanFMSongListDetailObserver(this));
     }
 
     private void initView() {
-        activityViewWrapper = new DouBanFMSongListActivityViewWrapper(View.inflate(this, R.layout.activity_dou_ban_fm_song_list, null));
-        setContentView(activityViewWrapper.rootView());
+        viewWrapper = new DouBanFMSongListActivityViewWrapper(View.inflate(this, R.layout.activity_dou_ban_fm_song_list, null));
+        setContentView(viewWrapper.rootView());
 
-        setSupportActionBar(activityViewWrapper.toolbar());
-        activityViewWrapper.toolbar().setTitle("");
-        activityViewWrapper.toolbarLayout().setTitle("");
+        setSupportActionBar(viewWrapper.toolbar());
+        viewWrapper.toolbar().setTitle("");
+        viewWrapper.toolbarLayout().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
@@ -77,22 +112,29 @@ public class DouBanFMSongListActivity extends BaseActivity implements View.OnCli
      * @param detail
      */
     private void getDetail(DouBanFMSongListDetail detail) {
-        activityViewWrapper.coverImageView().load(detail.getCover(), android.R.color.transparent, android.R.color.transparent);
-        activityViewWrapper.creatorPictureImageView().load(detail.getCreator().getPicture()).circular();
-        activityViewWrapper.titleTextView().setText(detail.getTitle());
-        activityViewWrapper.creatorNameTextView().setText(detail.getCreator().getName());
-        activityViewWrapper.collectedCountTextView().setText("" + detail.getCollected_count());
-        activityViewWrapper.collectedCountTextView().setVisibility(View.VISIBLE);
-        activityViewWrapper.containerRecycleView().setLayoutManager(new LinearLayoutManager(this));
-        activityViewWrapper.containerRecycleView().setAdapter(new DouBanFMSongListDetailAdapter(this, detail.getSongs()));
-        activityViewWrapper.starCheckBox().setOnClickListener(this);
-        activityViewWrapper.shareCheckBox().setOnClickListener(this);
-        activityViewWrapper.downloadCheckBox().setOnClickListener(this);
+        viewWrapper.coverImageView().load(detail.getCover(), android.R.color.transparent, android.R.color.transparent);
+        viewWrapper.creatorPictureImageView().load(detail.getCreator().getPicture()).circular();
+        viewWrapper.titleTextView().setText(detail.getTitle());
+        viewWrapper.creatorNameTextView().setText(detail.getCreator().getName());
+        viewWrapper.collectedCountTextView().setText("" + detail.getCollected_count());
+        viewWrapper.collectedCountTextView().setVisibility(View.VISIBLE);
+        viewWrapper.containerRecycleView().setLayoutManager(new LinearLayoutManager(this));
+        viewWrapper.containerRecycleView().setAdapter(new DouBanFMSongListDetailAdapter(this, detail.getSongs()));
+        viewWrapper.starCheckBox().setOnClickListener(this);
+        viewWrapper.shareCheckBox().setOnClickListener(this);
+        viewWrapper.downloadCheckBox().setOnClickListener(this);
+        viewWrapper.playCheckBox().setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
+        if (v == viewWrapper.starCheckBox()) {
 
+        } else if (v == viewWrapper.shareCheckBox()) {
+
+        } else if (v == viewWrapper.downloadCheckBox()) {
+
+        }
     }
 
     /**
@@ -107,7 +149,7 @@ public class DouBanFMSongListActivity extends BaseActivity implements View.OnCli
         @Override
         public void onError(Throwable e) {
             ToastUtils.showShortToast("获取歌单详情失败（" + e.getMessage() + "）");
-            LogUtils.e(e);
+            LogUtil.e(e);
         }
 
         @Override

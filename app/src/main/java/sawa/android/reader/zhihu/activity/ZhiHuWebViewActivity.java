@@ -16,6 +16,7 @@ import sawa.android.reader.common.DefaultObserver;
 import sawa.android.reader.common.WebViewActivity;
 import sawa.android.reader.global.Application;
 import sawa.android.reader.http.ZhiHuApi;
+import sawa.android.reader.util.LogUtil;
 import sawa.android.reader.zhihu.bean.ZhiHuNewsDetailResponse;
 
 /**
@@ -46,7 +47,7 @@ public class ZhiHuWebViewActivity extends WebViewActivity {
      */
     private void response(ZhiHuNewsDetailResponse response) {
         view.toolbar().setTitle(response.getTitle());
-        view.toolBarLayout().setTitle(Html.fromHtml("<font fontSize=12>" + response.getTitle() + "</font>"));
+        view.toolbarLayout().setTitle(Html.fromHtml("<font fontSize=12>" + response.getTitle() + "</font>"));
         view.headerImageView().load(response.getImage());
         String cssStr = "<link rel=\"stylesheet\" type=\"text/css\" href=\"%s\" />";
         String html = response.getBody();
@@ -74,7 +75,7 @@ public class ZhiHuWebViewActivity extends WebViewActivity {
 
         @Override
         public void onError(Throwable e) {
-            LogUtils.e(e);
+            LogUtil.e(e);
         }
 
         @Override

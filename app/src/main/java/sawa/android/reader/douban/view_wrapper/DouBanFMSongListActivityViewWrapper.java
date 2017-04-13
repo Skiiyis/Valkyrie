@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import sawa.android.reader.R;
@@ -57,6 +58,14 @@ public class DouBanFMSongListActivityViewWrapper extends BaseViewWrapper {
 
     public CheckBox downloadCheckBox() {
         return (CheckBox) rootView().findViewById(R.id.cb_download);
+    }
+
+    public CheckBox playCheckBox() {
+        return (CheckBox) rootView().findViewById(R.id.cb_play);
+    }
+
+    public LinearLayout actionBarLinearLayout() {
+        return (LinearLayout) rootView().findViewById(R.id.ll_action_bar);
     }
 
     public CheckBox shareCheckBox() {

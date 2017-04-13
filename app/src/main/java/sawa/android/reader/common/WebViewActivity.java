@@ -21,8 +21,10 @@ public class WebViewActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         view = new WebViewActivityViewWrapper(View.inflate(this, R.layout.activity_web_view, null));
         setContentView(view.rootView());
-        setSupportActionBar(view.toolbar());
 
+        setSupportActionBar(view.toolbar());
+        view.toolbar().setTitle("");
+        view.toolbarLayout().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
