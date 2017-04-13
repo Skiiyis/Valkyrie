@@ -10,6 +10,7 @@ import sawa.android.reader.main.bean.DouBanFMSongList;
  */
 
 public class DouBanFMSongListDetail extends DouBanFMSongList implements Serializable {
+
     private List<Song> songs;
 
     public List<Song> getSongs() {
@@ -22,10 +23,19 @@ public class DouBanFMSongListDetail extends DouBanFMSongList implements Serializ
 
     public static class Song implements Serializable {
         private String picture;
+        private String sid;
         private String url;
         private String title;
         private String artist;
         private List<Singer> singers;
+
+        public String getSid() {
+            return sid;
+        }
+
+        public void setSid(String sid) {
+            this.sid = sid;
+        }
 
         public String getPicture() {
             return picture;

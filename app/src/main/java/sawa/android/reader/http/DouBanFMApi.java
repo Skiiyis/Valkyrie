@@ -21,7 +21,9 @@ public class DouBanFMApi extends BaseApi {
     public static final String HOST = "https://api.douban.com/v2/fm/";
 
     public static Observable<List<DouBanFMChannel>> channelList() {
-        return retrofit(HOST).create(ChannelListService.class).channelList()
+        return retrofit(HOST)
+                .create(ChannelListService.class)
+                .channelList()
                 .map(new Function<DouBanFMChannelsResponse, List<DouBanFMChannel>>() {
                     @Override
                     public List<DouBanFMChannel> apply(DouBanFMChannelsResponse response) throws Exception {
@@ -33,20 +35,25 @@ public class DouBanFMApi extends BaseApi {
     }
 
     public static Observable<List<DouBanFMSongList>> songList() {
-        return retrofit(HOST).create(SongListService.class).songList().map(new Function<DouBanFMSongListResponse, List<DouBanFMSongList>>() {
-            @Override
-            public List<DouBanFMSongList> apply(DouBanFMSongListResponse response) throws Exception {
-                final List<DouBanFMSongList> songLists = new ArrayList<>();
-                for (DouBanFMSongListResponse.SongList songList : response.getSonglists()) {
-                    songLists.addAll(songList.getProgrammes());
-                }
-                return songLists;
-            }
-        });
+        return retrofit(HOST)
+                .create(SongListService.class)
+                .songList()
+                .map(new Function<DouBanFMSongListResponse, List<DouBanFMSongList>>() {
+                    @Override
+                    public List<DouBanFMSongList> apply(DouBanFMSongListResponse response) throws Exception {
+                        final List<DouBanFMSongList> songLists = new ArrayList<>();
+                        for (DouBanFMSongListResponse.SongList songList : response.getSonglists()) {
+                            songLists.addAll(songList.getProgrammes());
+                        }
+                        return songLists;
+                    }
+                });
     }
 
     public static Observable<DouBanFMSongListDetail> songListDetail(String songListId) {
-        return retrofit(HOST).create(SongListDetailService.class).songListDetail(songListId);
+        return retrofit(HOST)
+                .create(SongListDetailService.class)
+                .songListDetail(songListId);
     }
 
     /**

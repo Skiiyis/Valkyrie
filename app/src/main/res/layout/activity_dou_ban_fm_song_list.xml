@@ -107,6 +107,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:layout_gravity="right"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/AppTheme.PopupOverlay"
                 app:title="豆瓣歌单" />
@@ -119,46 +120,63 @@
             android:layout_height="wrap_content"
             android:background="@color/write_pure"
             android:orientation="horizontal"
+            android:paddingBottom="6dp"
             android:paddingTop="6dp">
-
-            <CheckBox
-                android:id="@+id/cb_star"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
+            <android.support.v4.widget.Space
+                android:layout_width="0dp"
                 android:layout_weight="1"
-                android:button="@null"
-                android:drawableTop="@drawable/selector_ic_star" />
+                android:layout_height="match_parent" />
 
-            <CheckBox
-                android:id="@+id/cb_play"
-                android:layout_width="match_parent"
+            <ImageView
+                android:id="@+id/iv_star"
+                android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:layout_weight="1"
-                android:button="@null"
-                android:drawableTop="@drawable/selector_ic_play" />
+                android:src="@drawable/ic_star_32dp_default" />
 
-            <CheckBox
-                android:id="@+id/cb_download"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:button="@null"
-                android:drawableTop="@drawable/selector_ic_download" />
+            <android.support.v4.widget.Space
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="match_parent" />
 
-            <CheckBox
-                android:id="@+id/cb_share"
-                android:layout_width="match_parent"
+            <ImageView
+                android:id="@+id/iv_play"
+                android:layout_width="wrap_content"
                 android:layout_height="40dp"
+                android:src="@drawable/ic_play" />
+
+            <android.support.v4.widget.Space
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="match_parent" />
+
+            <ImageView
+                android:id="@+id/iv_download"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:src="@drawable/selector_ic_download" />
+
+            <android.support.v4.widget.Space
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="match_parent" />
+
+            <ImageView
+                android:id="@+id/iv_share"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:src="@drawable/selector_ic_share" />
+
+            <android.support.v4.widget.Space
+                android:layout_width="0dp"
                 android:layout_weight="1"
-                android:button="@null"
-                android:drawableTop="@drawable/selector_ic_share" />
+                android:layout_height="match_parent" />
 
         </LinearLayout>
 
         <View
-            android:background="@color/color_divider"
             android:layout_width="match_parent"
-            android:layout_height="0.5dp"/>
+            android:layout_height="0.5dp"
+            android:background="@color/color_divider" />
 
     </android.support.design.widget.AppBarLayout>
 

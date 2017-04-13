@@ -1,4 +1,4 @@
-package sawa.android.reader.common;
+package sawa.android.reader.webview;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import sawa.android.reader.R;
+import sawa.android.reader.common.BaseActivity;
 
 /**
  * Created by hasee on 2017/3/19.
@@ -45,5 +46,11 @@ public class WebViewActivity extends BaseActivity {
             finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        view.contentWebView().destroy();
     }
 }

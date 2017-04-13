@@ -16,6 +16,8 @@ import sawa.android.reader.http.ZhiHuApi;
 import sawa.android.reader.main.adapter.ZhiHuViewAdapter;
 import sawa.android.reader.main.bean.ZhiHuNewsLatestResponse;
 import sawa.android.reader.main.view_wrapper.ViewRecycleViewWrapper;
+import sawa.android.reader.util.CacheUtil;
+import sawa.android.reader.util.LogUtil;
 
 /**
  * Created by hasee on 2017/3/11.
@@ -23,9 +25,24 @@ import sawa.android.reader.main.view_wrapper.ViewRecycleViewWrapper;
 public class ZhiHuMainFragment extends BaseFragment {
 
     private ViewRecycleViewWrapper viewRecycleViewWrapper;
+    private static final String CACHE_KEY = ZhiHuMainFragment.class.getSimpleName();
 
     @Override
     protected void onInflated(final View contentView) {
+
+        NewsLatestZhiHuViewObserver observer = new NewsLatestZhiHuViewObserver(ZhiHuMainFragment.this);
+
+        Observable.just(CACHE_KEY)
+                .observeOn(Schedulers.io())
+                .map(new Function<String, ZhiHuNewsLatestResponse>() {
+                    @Override
+                    public ZhiHuNewsLatestResponse apply(String key) throws Exception {
+                        return CacheUtil.cache(CACHE_KEY, ZhiHuNewsLatestResponse.class);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+
         Observable.just(0)
                 .doOnNext(new Consumer<Integer>() {
                     @Override
@@ -40,8 +57,14 @@ public class ZhiHuMainFragment extends BaseFragment {
                         return new ZhiHuApi().newsLatest();
                     }
                 })
+                .doOnNext(new Consumer<ZhiHuNewsLatestResponse>() {
+                    @Override
+                    public void accept(ZhiHuNewsLatestResponse response) throws Exception {
+                        CacheUtil.cacheJson(CACHE_KEY, response);
+                    }
+                })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new NewsLatestZhiHuViewObserver(ZhiHuMainFragment.this));
+                .subscribe(observer);
     }
 
     private void response(ZhiHuNewsLatestResponse response) {
@@ -56,6 +79,12 @@ public class ZhiHuMainFragment extends BaseFragment {
 
         public NewsLatestZhiHuViewObserver(ZhiHuMainFragment zhiHuMainFragment) {
             super(zhiHuMainFragment);
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            super.onError(e);
+            LogUtil.e(e);
         }
 
         @Override

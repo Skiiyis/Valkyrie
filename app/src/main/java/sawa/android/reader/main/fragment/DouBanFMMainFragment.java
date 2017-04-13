@@ -6,9 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.blankj.utilcode.utils.LogUtils;
+import com.google.gson.reflect.TypeToken;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +27,7 @@ import sawa.android.reader.main.bean.DouBanFMSongList;
 import sawa.android.reader.main.view_model.DouBanFMViewModel;
 import sawa.android.reader.main.view_wrapper.DouBanFMViewWrapper;
 import sawa.android.reader.main.view_wrapper.ViewRecycleViewWrapper;
+import sawa.android.reader.util.CacheUtil;
 import sawa.android.reader.util.LogUtil;
 
 /**
@@ -36,25 +36,41 @@ import sawa.android.reader.util.LogUtil;
 public class DouBanFMMainFragment extends BaseFragment {
 
     private ViewRecycleViewWrapper viewRecycleViewWrapper;
+    private static final String CACHE_KEY = DouBanFMMainFragment.class.getSimpleName();
 
     @Override
     protected void onInflated(final View contentView) {
-        Observable.just(0)
-                .doOnNext(new Consumer<Integer>() {
-                    @Override
-                    public void accept(Integer integer) throws Exception {
-                        viewRecycleViewWrapper = new ViewRecycleViewWrapper(contentView);
-                    }
-                })
+        viewRecycleViewWrapper = new ViewRecycleViewWrapper(contentView);
+        DouBanFMSongListObserver observer = new DouBanFMSongListObserver(this);
+
+        Observable.just(CACHE_KEY)
                 .observeOn(Schedulers.io())
-                .flatMap(new Function<Integer, Observable<List<DouBanFMSongList>>>() {
+                .map(new Function<String, List<DouBanFMSongList>>() {
                     @Override
-                    public Observable<List<DouBanFMSongList>> apply(Integer integer) throws Exception {
-                        return DouBanFMApi.songList();
+                    public List<DouBanFMSongList> apply(String key) throws Exception {
+                        return CacheUtil.cacheList(CACHE_KEY, new TypeToken<List<DouBanFMSongList>>() {
+                        });
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DouBanFMSongListObserver(this));
+                .subscribe(observer);
+
+        Observable.just(CACHE_KEY)
+                .observeOn(Schedulers.io())
+                .flatMap(new Function<String, Observable<List<DouBanFMSongList>>>() {
+                    @Override
+                    public Observable<List<DouBanFMSongList>> apply(String key) throws Exception {
+                        return DouBanFMApi.songList();
+                    }
+                })
+                .doOnNext(new Consumer<List<DouBanFMSongList>>() {
+                    @Override
+                    public void accept(List<DouBanFMSongList> douBanFMSongLists) throws Exception {
+                        CacheUtil.cacheJson(CACHE_KEY, douBanFMSongLists);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
     }
 
     private void getChannelsResponse(List<DouBanFMChannel.Channel> douBanFMChannels) {
@@ -88,14 +104,15 @@ public class DouBanFMMainFragment extends BaseFragment {
             if (viewModel == null) {
                 viewModel = new DouBanFMViewModel(view);
                 view.rootView().setTag(viewModel);
-                view.rootView().setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        DouBanFMSongListActivity.launch("" + douBanFMSongLists.get(position).getId());
-                    }
-                });
             }
             viewModel.bind(douBanFMSongLists.get(position));
+
+            view.rootView().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DouBanFMSongListActivity.launch("" + douBanFMSongLists.get(position).getId());
+                }
+            });
         }
 
         @Override
@@ -115,6 +132,7 @@ public class DouBanFMMainFragment extends BaseFragment {
 
         @Override
         public void onError(Throwable e) {
+            super.onError(e);
             LogUtil.e(e);
         }
 
@@ -131,8 +149,6 @@ public class DouBanFMMainFragment extends BaseFragment {
      */
     private static class DouBanFMChannelsObserver extends DefaultObserver<DouBanFMMainFragment, List<DouBanFMChannel>> {
 
-        private WeakReference<DouBanFMMainFragment> view;
-
         public DouBanFMChannelsObserver(DouBanFMMainFragment douBanFMMainFragment) {
             super(douBanFMMainFragment);
         }
@@ -144,13 +160,12 @@ public class DouBanFMMainFragment extends BaseFragment {
 
         @Override
         public void onNext(List<DouBanFMChannel> douBanFMChannels) {
-            DouBanFMMainFragment douBanFMMainFragment = view.get();
-            if (douBanFMMainFragment != null) {
+            if (ref() != null) {
                 ArrayList<DouBanFMChannel.Channel> channels = new ArrayList<>();
                 for (DouBanFMChannel response : douBanFMChannels) {
                     channels.addAll(response.getChls());
                 }
-                douBanFMMainFragment.getChannelsResponse(channels);
+                ref().getChannelsResponse(channels);
             }
         }
     }

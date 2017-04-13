@@ -14,7 +14,7 @@ import sawa.android.reader.BuildConfig;
  * Created by mc100 on 2017/4/13.
  */
 
-public class BaseApi {
+public abstract class BaseApi {
 
     protected static Retrofit retrofit(String host) {
 
@@ -27,15 +27,6 @@ public class BaseApi {
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             builder.addInterceptor(interceptor);
         }
-
-        /*builder.addInterceptor(new Interceptor() {
-            @Override
-            public Response intercept(Chain chain) throws IOException {
-                Response response = chain.proceed(chain.request());
-                CacheManager.INSTANCE.cache(chain.request().url().toString(), response.body().string());
-                return response;
-            }
-        });*/
 
         return new Retrofit.Builder()
                 .client(builder.build())

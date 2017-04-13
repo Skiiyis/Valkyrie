@@ -6,16 +6,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 
-import com.blankj.utilcode.utils.LogUtils;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import sawa.android.reader.common.DefaultObserver;
-import sawa.android.reader.common.WebViewActivity;
+import sawa.android.reader.webview.WebViewActivity;
 import sawa.android.reader.global.Application;
 import sawa.android.reader.http.ZhiHuApi;
+import sawa.android.reader.util.CacheUtil;
 import sawa.android.reader.util.LogUtil;
 import sawa.android.reader.zhihu.bean.ZhiHuNewsDetailResponse;
 
@@ -24,20 +26,43 @@ import sawa.android.reader.zhihu.bean.ZhiHuNewsDetailResponse;
  */
 public class ZhiHuWebViewActivity extends WebViewActivity {
 
+    private static final String CACHE_KEY = "zhihu";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        final String id = getIntent().getStringExtra("id");
+        NewsDetailObserver observer = new NewsDetailObserver(this);
 
-        Observable.just(getIntent().getStringExtra("id"))
+        Observable.just(id)
                 .observeOn(Schedulers.io())
+                .compose(this.<String>bindToLifecycle())
+                .map(new Function<String, ZhiHuNewsDetailResponse>() {
+                    @Override
+                    public ZhiHuNewsDetailResponse apply(String id) throws Exception {
+                        return CacheUtil.cache(CACHE_KEY + id, ZhiHuNewsDetailResponse.class);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+
+        Observable.just(id)
+                .observeOn(Schedulers.io())
+                .compose(this.<String>bindToLifecycle())
                 .flatMap(new Function<String, Observable<ZhiHuNewsDetailResponse>>() {
                     @Override
                     public Observable<ZhiHuNewsDetailResponse> apply(String id) throws Exception {
                         return ZhiHuApi.newsDetail(id);
                     }
                 })
+                .doOnNext(new Consumer<ZhiHuNewsDetailResponse>() {
+                    @Override
+                    public void accept(ZhiHuNewsDetailResponse zhiHuNewsDetailResponse) throws Exception {
+                        CacheUtil.cacheJson(CACHE_KEY + id, zhiHuNewsDetailResponse);
+                    }
+                })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new NewsDetailObserver(this));
+                .subscribe(observer);
     }
 
     /**
@@ -56,12 +81,6 @@ public class ZhiHuWebViewActivity extends WebViewActivity {
         }
         html = html.replace("<div class=\"img-place-holder\"></div>", "");
         view.contentWebView().loadData(html, "text/html; charset=UTF-8", null);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        view.contentWebView().destroy();
     }
 
     /**

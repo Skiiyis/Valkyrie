@@ -15,11 +15,15 @@ public class ZhiHuApi extends BaseApi {
     protected static String HOST = "http://news-at.zhihu.com/api/4/news/";
 
     public static Observable<ZhiHuNewsLatestResponse> newsLatest() {
-        return retrofit(HOST).create(NewsLatestService.class).newsLatest();
+        return retrofit(HOST)
+                .create(NewsLatestService.class)
+                .newsLatest();
     }
 
     public static Observable<ZhiHuNewsDetailResponse> newsDetail(String id) {
-        return retrofit(HOST).create(NewsDetailService.class).newsDetail(id);
+        return retrofit(HOST)
+                .create(NewsDetailService.class)
+                .newsDetail(id);
     }
 
     //http://news-at.zhihu.com/api/4/news/3892357

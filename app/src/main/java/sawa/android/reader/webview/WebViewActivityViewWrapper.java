@@ -1,4 +1,4 @@
-package sawa.android.reader.common;
+package sawa.android.reader.webview;
 
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.Toolbar;
@@ -6,6 +6,8 @@ import android.view.View;
 import android.webkit.WebView;
 
 import sawa.android.reader.R;
+import sawa.android.reader.common.BaseViewWrapper;
+import sawa.android.reader.common.PlusImageView;
 
 /**
  * Created by mc100 on 2017/4/13.

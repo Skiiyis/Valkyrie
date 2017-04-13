@@ -18,6 +18,7 @@ public class DouBanFMSongListDetailItemViewWrapper extends BaseViewWrapper {
     private TextView singerNameTextView;
     private PlusImageView coverImageView;
     private ImageView moreImageView;
+    private ImageView waveImageView;
 
     public DouBanFMSongListDetailItemViewWrapper(View rootView) {
         super(rootView);
@@ -50,4 +51,12 @@ public class DouBanFMSongListDetailItemViewWrapper extends BaseViewWrapper {
         }
         return moreImageView;
     }
+
+    public ImageView waveImageView() {
+        if (waveImageView == null) {
+            waveImageView = (ImageView) rootView().findViewById(R.id.iv_wave);
+        }
+        return waveImageView;
+    }
+
 }
