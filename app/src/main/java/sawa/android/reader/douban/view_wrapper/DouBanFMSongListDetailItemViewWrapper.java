@@ -25,28 +25,28 @@ public class DouBanFMSongListDetailItemViewWrapper extends BaseViewWrapper {
 
     public TextView songNameTextView() {
         if (songNameTextView == null) {
-            songNameTextView = (TextView) getRootView().findViewById(R.id.tv_song_name);
+            songNameTextView = (TextView) rootView().findViewById(R.id.tv_song_name);
         }
         return songNameTextView;
     }
 
     public TextView singerNameTextView() {
         if (singerNameTextView == null) {
-            singerNameTextView = (TextView) getRootView().findViewById(R.id.tv_singer_name);
+            singerNameTextView = (TextView) rootView().findViewById(R.id.tv_singer_name);
         }
         return singerNameTextView;
     }
 
     public PlusImageView coverImageView() {
         if (coverImageView == null) {
-            coverImageView = (PlusImageView) getRootView().findViewById(R.id.pv_cover);
+            coverImageView = (PlusImageView) rootView().findViewById(R.id.pv_cover);
         }
         return coverImageView;
     }
 
     public ImageView moreImageView() {
         if (moreImageView == null) {
-            moreImageView = (ImageView) getRootView().findViewById(R.id.iv_more);
+            moreImageView = (ImageView) rootView().findViewById(R.id.iv_more);
         }
         return moreImageView;
     }

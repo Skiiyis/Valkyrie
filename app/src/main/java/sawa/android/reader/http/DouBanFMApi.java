@@ -1,19 +1,17 @@
 package sawa.android.reader.http;
 
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
-import rx.Observable;
-import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import sawa.android.reader.douban.bean.DouBanFMSongListDetail;
 import sawa.android.reader.main.bean.DouBanFMChannel;
 import sawa.android.reader.main.bean.DouBanFMSongList;
@@ -29,50 +27,37 @@ public class DouBanFMApi {
         return new Retrofit.Builder()
                 .baseUrl(HOST)
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
     }
 
-    public static void channelList(Observer<List<DouBanFMChannel>> subscriber) {
-        final List<DouBanFMChannel> channels = new ArrayList<>();
-        ChannelListService channelListService = retrofit().create(ChannelListService.class);
-        channelListService.channelList()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .map(new Func1<DouBanFMChannelsResponse, List<DouBanFMChannel>>() {
+    public static Observable<List<DouBanFMChannel>> channelList() {
+        return retrofit().create(ChannelListService.class).channelList()
+                .map(new Function<DouBanFMChannelsResponse, List<DouBanFMChannel>>() {
                     @Override
-                    public List<DouBanFMChannel> call(DouBanFMChannelsResponse response) {
+                    public List<DouBanFMChannel> apply(DouBanFMChannelsResponse response) throws Exception {
+                        final List<DouBanFMChannel> channels = new ArrayList<>();
                         channels.addAll(response.getGroups());
                         return channels;
                     }
-                })
-                .subscribe(subscriber);
+                });
     }
 
-    public static void songList(Observer<List<DouBanFMSongList>> subscriber) {
-        final List<DouBanFMSongList> songLists = new ArrayList<>();
-        SongListService songListService = retrofit().create(SongListService.class);
-        songListService.songList()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .map(new Func1<DouBanFMSongListResponse, List<DouBanFMSongList>>() {
-                    @Override
-                    public List<DouBanFMSongList> call(DouBanFMSongListResponse response) {
-                        for (DouBanFMSongListResponse.SongList songList : response.getSonglists()) {
-                            songLists.addAll(songList.getProgrammes());
-                        }
-                        return songLists;
-                    }
-                })
-                .subscribe(subscriber);
+    public static Observable<List<DouBanFMSongList>> songList() {
+        return retrofit().create(SongListService.class).songList().map(new Function<DouBanFMSongListResponse, List<DouBanFMSongList>>() {
+            @Override
+            public List<DouBanFMSongList> apply(DouBanFMSongListResponse response) throws Exception {
+                final List<DouBanFMSongList> songLists = new ArrayList<>();
+                for (DouBanFMSongListResponse.SongList songList : response.getSonglists()) {
+                    songLists.addAll(songList.getProgrammes());
+                }
+                return songLists;
+            }
+        });
     }
 
-    public static void songListDetail(String songListId, Observer<DouBanFMSongListDetail> subscriber) {
-        SongListDetailService songListDetailService = retrofit().create(SongListDetailService.class);
-        songListDetailService.songListDetail(songListId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(subscriber);
+    public static Observable<DouBanFMSongListDetail> songListDetail(String songListId) {
+        return retrofit().create(SongListDetailService.class).songListDetail(songListId);
     }
 
     /**

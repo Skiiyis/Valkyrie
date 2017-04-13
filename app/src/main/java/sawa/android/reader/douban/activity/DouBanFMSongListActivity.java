@@ -16,9 +16,14 @@ import com.blankj.utilcode.utils.ToastUtils;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-import rx.Observer;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import sawa.android.reader.R;
 import sawa.android.reader.common.BaseActivity;
+import sawa.android.reader.common.DefaultObserver;
 import sawa.android.reader.douban.bean.DouBanFMSongListDetail;
 import sawa.android.reader.douban.view_model.DouBanFMSongListDetailItemViewModel;
 import sawa.android.reader.douban.view_wrapper.DouBanFMSongListActivityViewWrapper;
@@ -26,6 +31,9 @@ import sawa.android.reader.douban.view_wrapper.DouBanFMSongListDetailItemViewWra
 import sawa.android.reader.global.Application;
 import sawa.android.reader.http.DouBanFMApi;
 
+/**
+ * 豆瓣歌单详情
+ */
 public class DouBanFMSongListActivity extends BaseActivity implements View.OnClickListener {
 
     private DouBanFMSongListActivityViewWrapper activityViewWrapper;
@@ -33,16 +41,34 @@ public class DouBanFMSongListActivity extends BaseActivity implements View.OnCli
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Observable.just(getIntent().getStringExtra("songListId"))
+                .doOnNext(new Consumer<String>() {
+                    @Override
+                    public void accept(String songListId) throws Exception {
+                        initView();
+                    }
+                })
+                .observeOn(Schedulers.io())
+                .flatMap(new Function<String, Observable<DouBanFMSongListDetail>>() {
+                    @Override
+                    public Observable<DouBanFMSongListDetail> apply(String songListId) throws Exception {
+                        return DouBanFMApi.songListDetail(songListId);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DouBanFMSongListDetailObserver(this));
+    }
+
+    private void initView() {
         activityViewWrapper = new DouBanFMSongListActivityViewWrapper(View.inflate(this, R.layout.activity_dou_ban_fm_song_list, null));
-        setContentView(activityViewWrapper.getRootView());
+        setContentView(activityViewWrapper.rootView());
 
         setSupportActionBar(activityViewWrapper.toolbar());
         activityViewWrapper.toolbar().setTitle("");
         activityViewWrapper.toolbarLayout().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-        DouBanFMApi.songListDetail(getIntent().getStringExtra("songListId"), new DouBanFMSongListDetailRequest(this));
     }
 
     /**
@@ -61,7 +87,6 @@ public class DouBanFMSongListActivity extends BaseActivity implements View.OnCli
         activityViewWrapper.containerRecycleView().setAdapter(new DouBanFMSongListDetailAdapter(this, detail.getSongs()));
         activityViewWrapper.starCheckBox().setOnClickListener(this);
         activityViewWrapper.shareCheckBox().setOnClickListener(this);
-        activityViewWrapper.toolbar().setTitle(detail.getTitle());
         activityViewWrapper.downloadCheckBox().setOnClickListener(this);
     }
 
@@ -73,16 +98,10 @@ public class DouBanFMSongListActivity extends BaseActivity implements View.OnCli
     /**
      * 请求豆瓣FM 歌单详情
      */
-    private static class DouBanFMSongListDetailRequest implements Observer<DouBanFMSongListDetail> {
-        WeakReference<DouBanFMSongListActivity> activity;
+    private static class DouBanFMSongListDetailObserver extends DefaultObserver<DouBanFMSongListActivity, DouBanFMSongListDetail> {
 
-        public DouBanFMSongListDetailRequest(DouBanFMSongListActivity activity) {
-            this.activity = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void onCompleted() {
-
+        public DouBanFMSongListDetailObserver(DouBanFMSongListActivity activity) {
+            super(activity);
         }
 
         @Override
@@ -93,9 +112,8 @@ public class DouBanFMSongListActivity extends BaseActivity implements View.OnCli
 
         @Override
         public void onNext(DouBanFMSongListDetail douBanFMSongListDetail) {
-            DouBanFMSongListActivity activity = this.activity.get();
-            if (activity != null) {
-                activity.getDetail(douBanFMSongListDetail);
+            if (ref() != null) {
+                ref().getDetail(douBanFMSongListDetail);
             }
         }
     }
@@ -105,7 +123,7 @@ public class DouBanFMSongListActivity extends BaseActivity implements View.OnCli
      */
     private static class DouBanFMSongListDetailAdapter extends RecyclerView.Adapter<DouBanFMSongListDetailItemViewWrapper> {
         private final List<DouBanFMSongListDetail.Song> songs;
-        private WeakReference<DouBanFMSongListActivity> activity;
+        private final WeakReference<DouBanFMSongListActivity> activity;
 
         public DouBanFMSongListDetailAdapter(DouBanFMSongListActivity activity, List<DouBanFMSongListDetail.Song> songs) {
             this.activity = new WeakReference<>(activity);
@@ -119,10 +137,10 @@ public class DouBanFMSongListActivity extends BaseActivity implements View.OnCli
 
         @Override
         public void onBindViewHolder(DouBanFMSongListDetailItemViewWrapper view, int position) {
-            DouBanFMSongListDetailItemViewModel viewModel = (DouBanFMSongListDetailItemViewModel) view.getRootView().getTag();
+            DouBanFMSongListDetailItemViewModel viewModel = (DouBanFMSongListDetailItemViewModel) view.rootView().getTag();
             if (viewModel == null) {
                 viewModel = new DouBanFMSongListDetailItemViewModel(view);
-                view.getRootView().setTag(viewModel);
+                view.rootView().setTag(viewModel);
             }
             viewModel.bind(songs.get(position));
         }

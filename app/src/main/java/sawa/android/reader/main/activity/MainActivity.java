@@ -1,28 +1,22 @@
 package sawa.android.reader.main.activity;
 
 import android.os.Bundle;
-import android.support.v4.view.PagerAdapter;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
-
-import java.lang.ref.WeakReference;
 
 import sawa.android.reader.R;
 import sawa.android.reader.common.BaseActivity;
-import sawa.android.reader.common.BaseView;
-import sawa.android.reader.common.LifeCycleViewHelper;
-import sawa.android.reader.global.Application;
-import sawa.android.reader.main.view.DouBanFMView;
-import sawa.android.reader.main.view.ZhiHuView;
+import sawa.android.reader.main.fragment.DouBanFMMainFragment;
+import sawa.android.reader.main.fragment.ZhiHuMainFragment;
 import sawa.android.reader.main.view_wrapper.MainActivityViewWrapper;
 
 public class MainActivity extends BaseActivity {
 
-    private LifeCycleViewHelper helper = new LifeCycleViewHelper();
     private int currentChecked = 0;
 
     /*
@@ -34,9 +28,9 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final MainActivityViewWrapper mainActivityViewWrapper = new MainActivityViewWrapper(View.inflate(this, R.layout.activity_main, null));
-        setContentView(mainActivityViewWrapper.getRootView());
+        setContentView(mainActivityViewWrapper.rootView());
 
-        mainActivityViewWrapper.containerViewPager().setAdapter(new MainFragmentAdapter(this));
+        mainActivityViewWrapper.containerViewPager().setAdapter(new MainFragmentAdapter(getSupportFragmentManager()));
         mainActivityViewWrapper.buttonRadioGroup().setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
@@ -71,79 +65,33 @@ public class MainActivity extends BaseActivity {
 
             }
         });
+        mainActivityViewWrapper.containerViewPager().setOffscreenPageLimit(3);
     }
 
     /**
      * 首页Adapter
      */
-    public static final class MainFragmentAdapter extends PagerAdapter {
+    public static final class MainFragmentAdapter extends FragmentPagerAdapter {
 
-        private WeakReference<MainActivity> activityRef;
-
-        public MainFragmentAdapter(MainActivity activity) {
-            activityRef = new WeakReference<>(activity);
+        public MainFragmentAdapter(FragmentManager fm) {
+            super(fm);
         }
 
-        private static final String[] title = new String[]{"知乎", "FM", "乐子", "Android"};
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 0:
+                    return new ZhiHuMainFragment();
+                case 1:
+                    return new DouBanFMMainFragment();
+                default:
+                    return new ZhiHuMainFragment();
+            }
+        }
 
         @Override
         public int getCount() {
             return 4;
         }
-
-        @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return view == object;
-        }
-
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            BaseView childView = null;
-            switch (position) {
-                case 0:
-                    childView = new ZhiHuView(Application.get());
-                    break;
-                case 1:
-                    childView = new DouBanFMView(Application.get());
-                    break;
-                default:
-                    TextView child = new TextView(Application.get());
-                    container.addView(child);
-                    return child;
-            }
-            if (activityRef.get() != null) {
-                activityRef.get().helper.addLifeCycleView(childView);
-            }
-            container.addView(childView);
-            return childView;
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView((View) object);
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return title[position];
-        }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        helper.onStart();
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        helper.onRestart();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        helper.onStop();
     }
 }

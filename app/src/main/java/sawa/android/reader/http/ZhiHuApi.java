@@ -1,15 +1,12 @@
 package sawa.android.reader.http;
 
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+
+import io.reactivex.Observable;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
-import retrofit2.http.Query;
-import rx.Observable;
-import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import sawa.android.reader.main.bean.ZhiHuNewsLatestResponse;
 import sawa.android.reader.zhihu.bean.ZhiHuNewsDetailResponse;
 
@@ -20,40 +17,30 @@ public class ZhiHuApi {
 
     public static final String HOST = "http://news-at.zhihu.com/api/4/news/";
 
-    public static void newsLatest(Observer<ZhiHuNewsLatestResponse> subscriber) {
-        Retrofit retrofit = new Retrofit.Builder()
+    private static Retrofit retrofit() {
+        return new Retrofit.Builder()
                 .baseUrl(HOST)
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
-        NewsLatestService newsLatestService = retrofit.create(NewsLatestService.class);
-        newsLatestService.getNewsLatest()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(subscriber);
     }
 
-    public static void newsDetail(Observer<ZhiHuNewsDetailResponse> subscriber, String id) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(HOST)
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .build();
-        NewsDetailService newsLatestService = retrofit.create(NewsDetailService.class);
-        newsLatestService.getNewsLatest(id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(subscriber);
+    public static Observable<ZhiHuNewsLatestResponse> newsLatest() {
+        return retrofit().create(NewsLatestService.class).newsLatest();
+    }
+
+    public static Observable<ZhiHuNewsDetailResponse> newsDetail(String id) {
+        return retrofit().create(NewsDetailService.class).newsDetail(id);
     }
 
     //http://news-at.zhihu.com/api/4/news/3892357
     public interface NewsDetailService {
         @GET("{id}")
-        Observable<ZhiHuNewsDetailResponse> getNewsLatest(@Path("id") String id);
+        Observable<ZhiHuNewsDetailResponse> newsDetail(@Path("id") String id);
     }
 
     public interface NewsLatestService {
         @GET("latest")
-        Observable<ZhiHuNewsLatestResponse> getNewsLatest();
+        Observable<ZhiHuNewsLatestResponse> newsLatest();
     }
 }

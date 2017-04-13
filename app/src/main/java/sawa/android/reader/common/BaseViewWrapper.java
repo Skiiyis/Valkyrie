@@ -12,7 +12,7 @@ public abstract class BaseViewWrapper extends RecyclerView.ViewHolder {
         super(rootView);
     }
 
-    public View getRootView() {
+    public View rootView() {
         return itemView;
     }
 }

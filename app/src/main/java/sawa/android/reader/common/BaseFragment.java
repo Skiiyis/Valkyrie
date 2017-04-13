@@ -12,19 +12,16 @@ import android.view.ViewGroup;
  */
 public abstract class BaseFragment extends Fragment {
 
-    protected View contentView;
-
-    public abstract int layoutResId();
-
-    protected <T extends View> T findView(int id) {
-        return (T) contentView.findViewById(id);
-    }
+    protected abstract int layoutResId();
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        contentView = inflater.inflate(layoutResId(), null);
+        View contentView = inflater.inflate(layoutResId(), null);
         container.addView(contentView);
+        onInflated(contentView);
         return contentView;
     }
+
+    protected abstract void onInflated(View contentView);
 }

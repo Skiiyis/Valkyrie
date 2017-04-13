@@ -17,10 +17,10 @@ public class MainActivityViewWrapper extends BaseViewWrapper {
     }
 
     public ViewPager containerViewPager() {
-        return (ViewPager) getRootView().findViewById(R.id.vp_main_container);
+        return (ViewPager) rootView().findViewById(R.id.vp_main_container);
     }
 
     public RadioGroup buttonRadioGroup() {
-        return (RadioGroup) getRootView().findViewById(R.id.rg_bottom);
+        return (RadioGroup) rootView().findViewById(R.id.rg_bottom);
     }
 }

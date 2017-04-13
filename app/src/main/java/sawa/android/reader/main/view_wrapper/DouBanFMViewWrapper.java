@@ -6,7 +6,6 @@ import android.widget.TextView;
 import sawa.android.reader.R;
 import sawa.android.reader.common.BaseViewWrapper;
 import sawa.android.reader.common.PlusImageView;
-import sawa.android.reader.main.view_model.DouBanFMViewModel;
 
 /**
  * Created by hasee on 2017/3/27.
@@ -24,28 +23,28 @@ public class DouBanFMViewWrapper extends BaseViewWrapper {
 
     public PlusImageView coverImageView() {
         if (coverImageView == null) {
-            coverImageView = (PlusImageView) getRootView().findViewById(R.id.pv_cover);
+            coverImageView = (PlusImageView) rootView().findViewById(R.id.pv_cover);
         }
         return coverImageView;
     }
 
     public PlusImageView statusImageView() {
         if (statusImageView == null) {
-            statusImageView = (PlusImageView) getRootView().findViewById(R.id.pv_status);
+            statusImageView = (PlusImageView) rootView().findViewById(R.id.pv_status);
         }
         return statusImageView;
     }
 
     public TextView titleTextView() {
         if (titleTextView == null) {
-            titleTextView = (TextView) getRootView().findViewById(R.id.tv_text);
+            titleTextView = (TextView) rootView().findViewById(R.id.tv_text);
         }
         return titleTextView;
     }
 
     public TextView collectedCountTextView(){
         if (countTextView == null) {
-            countTextView = (TextView) getRootView().findViewById(R.id.tv_collected_count);
+            countTextView = (TextView) rootView().findViewById(R.id.tv_collected_count);
         }
         return countTextView;
     }

@@ -21,10 +21,10 @@ public class ViewRecycleViewWrapper extends BaseViewWrapper {
     }
 
     /*public TextView contentTextView() {
-        return (TextView) getRootView().findViewById(R.id.tv_content);
+        return (TextView) rootView().findViewById(R.id.tv_content);
     }
 */
     public RecyclerView contentRecycleView() {
-        return (RecyclerView) getRootView().findViewById(R.id.rv_container);
+        return (RecyclerView) rootView().findViewById(R.id.rv_container);
     }
 }

@@ -4,18 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.text.Html;
-import android.webkit.WebView;
 
 import com.blankj.utilcode.utils.LogUtils;
 
-import java.lang.ref.WeakReference;
-
-import rx.Subscriber;
-import sawa.android.reader.R;
-import sawa.android.reader.common.PlusImageView;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
+import sawa.android.reader.common.DefaultObserver;
 import sawa.android.reader.common.WebViewActivity;
 import sawa.android.reader.global.Application;
 import sawa.android.reader.http.ZhiHuApi;
@@ -26,20 +23,20 @@ import sawa.android.reader.zhihu.bean.ZhiHuNewsDetailResponse;
  */
 public class ZhiHuWebViewActivity extends WebViewActivity {
 
-    private WebView contentWebView;
-    private CollapsingToolbarLayout toolbarLayout;
-    private PlusImageView pvHeader;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        contentWebView = (WebView) findViewById(R.id.wv_content);
 
-        String id = getIntent().getStringExtra("id");
-        ZhiHuApi.newsDetail(new NewsDetailRequest(this), id);
-
-        toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
-        pvHeader = (PlusImageView) findViewById(R.id.pv_header);
+        Observable.just(getIntent().getStringExtra("id"))
+                .observeOn(Schedulers.io())
+                .flatMap(new Function<String, Observable<ZhiHuNewsDetailResponse>>() {
+                    @Override
+                    public Observable<ZhiHuNewsDetailResponse> apply(String id) throws Exception {
+                        return ZhiHuApi.newsDetail(id);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new NewsDetailObserver(this));
     }
 
     /**
@@ -48,49 +45,42 @@ public class ZhiHuWebViewActivity extends WebViewActivity {
      * @param response
      */
     private void response(ZhiHuNewsDetailResponse response) {
-        toolbar.setTitle(response.getTitle());
-        toolbarLayout.setTitle(Html.fromHtml("<font fontSize=12>" + response.getTitle() + "</font>"));
-        pvHeader.load(response.getImage());
+        view.toolbar().setTitle(response.getTitle());
+        view.toolBarLayout().setTitle(Html.fromHtml("<font fontSize=12>" + response.getTitle() + "</font>"));
+        view.headerImageView().load(response.getImage());
         String cssStr = "<link rel=\"stylesheet\" type=\"text/css\" href=\"%s\" />";
         String html = response.getBody();
         for (String cssLink : response.getCss()) {
             html = html + String.format(cssStr, cssLink);
         }
         html = html.replace("<div class=\"img-place-holder\"></div>", "");
-        contentWebView.loadData(html, "text/html; charset=UTF-8", null);
+        view.contentWebView().loadData(html, "text/html; charset=UTF-8", null);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        contentWebView.destroy();
+        view.contentWebView().destroy();
     }
 
     /**
      * 请求知乎日报内容
      */
-    private static class NewsDetailRequest extends Subscriber<ZhiHuNewsDetailResponse> {
+    private static class NewsDetailObserver extends DefaultObserver<ZhiHuWebViewActivity, ZhiHuNewsDetailResponse> {
 
-        private final WeakReference<ZhiHuWebViewActivity> webViewActivity;
-
-        public NewsDetailRequest(ZhiHuWebViewActivity webViewActivity) {
-            this.webViewActivity = new WeakReference<>(webViewActivity);
-        }
-
-        @Override
-        public void onCompleted() {
-
+        public NewsDetailObserver(ZhiHuWebViewActivity zhiHuWebViewActivity) {
+            super(zhiHuWebViewActivity);
         }
 
         @Override
         public void onError(Throwable e) {
-            LogUtils.e("error", "has an error", e);
+            LogUtils.e(e);
         }
 
         @Override
         public void onNext(ZhiHuNewsDetailResponse zhiHuNewsDetailResponse) {
-            if (webViewActivity.get() != null) {
-                webViewActivity.get().response(zhiHuNewsDetailResponse);
+            if (ref() != null) {
+                ref().response(zhiHuNewsDetailResponse);
             }
         }
     }

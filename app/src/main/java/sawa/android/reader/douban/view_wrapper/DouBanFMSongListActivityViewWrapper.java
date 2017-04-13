@@ -24,48 +24,48 @@ public class DouBanFMSongListActivityViewWrapper extends BaseViewWrapper {
     }
 
     public Toolbar toolbar() {
-        return (Toolbar) getRootView().findViewById(R.id.toolbar);
+        return (Toolbar) rootView().findViewById(R.id.toolbar);
     }
 
     public CollapsingToolbarLayout toolbarLayout() {
-        return (CollapsingToolbarLayout) getRootView().findViewById(R.id.toolbar_layout);
+        return (CollapsingToolbarLayout) rootView().findViewById(R.id.toolbar_layout);
     }
 
     public PlusImageView coverImageView() {
-        return (PlusImageView) getRootView().findViewById(R.id.pv_cover);
+        return (PlusImageView) rootView().findViewById(R.id.pv_cover);
     }
 
     public PlusImageView creatorPictureImageView() {
-        return (PlusImageView) getRootView().findViewById(R.id.pv_creator_picture);
+        return (PlusImageView) rootView().findViewById(R.id.pv_creator_picture);
     }
 
     public TextView titleTextView() {
-        return (TextView) getRootView().findViewById(R.id.tv_title);
+        return (TextView) rootView().findViewById(R.id.tv_title);
     }
 
     public TextView creatorNameTextView() {
-        return (TextView) getRootView().findViewById(R.id.tv_creator);
+        return (TextView) rootView().findViewById(R.id.tv_creator);
     }
 
     public TextView collectedCountTextView() {
-        return (TextView) getRootView().findViewById(R.id.tv_collected_count);
+        return (TextView) rootView().findViewById(R.id.tv_collected_count);
     }
 
     public CheckBox starCheckBox() {
-        return (CheckBox) getRootView().findViewById(R.id.cb_star);
+        return (CheckBox) rootView().findViewById(R.id.cb_star);
     }
 
     public CheckBox downloadCheckBox() {
-        return (CheckBox) getRootView().findViewById(R.id.cb_download);
+        return (CheckBox) rootView().findViewById(R.id.cb_download);
     }
 
     public CheckBox shareCheckBox() {
-        return (CheckBox) getRootView().findViewById(R.id.cb_share);
+        return (CheckBox) rootView().findViewById(R.id.cb_share);
     }
 
     public RecyclerView containerRecycleView() {
         if (viewRecycleViewWrapper == null) {
-            viewRecycleViewWrapper = new ViewRecycleViewWrapper(getRootView());
+            viewRecycleViewWrapper = new ViewRecycleViewWrapper(rootView());
         }
         return viewRecycleViewWrapper.contentRecycleView();
     }
