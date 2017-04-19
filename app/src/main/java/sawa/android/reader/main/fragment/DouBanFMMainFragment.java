@@ -45,6 +45,7 @@ public class DouBanFMMainFragment extends BaseFragment {
 
         Observable.just(CACHE_KEY)
                 .observeOn(Schedulers.io())
+                .compose(this.<String>bindToLifecycle())
                 .map(new Function<String, List<DouBanFMSongList>>() {
                     @Override
                     public List<DouBanFMSongList> apply(String key) throws Exception {
@@ -57,6 +58,7 @@ public class DouBanFMMainFragment extends BaseFragment {
 
         Observable.just(CACHE_KEY)
                 .observeOn(Schedulers.io())
+                .compose(this.<String>bindToLifecycle())
                 .flatMap(new Function<String, Observable<List<DouBanFMSongList>>>() {
                     @Override
                     public Observable<List<DouBanFMSongList>> apply(String key) throws Exception {

@@ -11,6 +11,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
@@ -46,6 +47,10 @@ public class PlusImageView extends ImageView {
     }
 
     public PlusImageView load(String url, int placeholderDrawableResId, int errorDrawableResId) {
+        if (TextUtils.isEmpty(url)) {
+            setImageResource(placeholderDrawableResId);
+            return this;
+        }
         Picasso.with(Application.get()).load(url).placeholder(placeholderDrawableResId).error(errorDrawableResId).into(this);
         return this;
     }

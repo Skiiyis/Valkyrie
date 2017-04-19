@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
 
 import sawa.android.reader.R;
 import sawa.android.reader.common.BaseActivity;
@@ -20,7 +21,10 @@ public class WebViewActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        view = new WebViewActivityViewWrapper(View.inflate(this, R.layout.activity_web_view, null));
+        View rootView = View.inflate(this, R.layout.activity_web_view, null);
+        view = new WebViewActivityViewWrapper(rootView);
+        view.webViewNestedScrollView().addView(new WebView(getApplicationContext()));
+        setWindowStatusBarColor(this, android.R.color.transparent);
         setContentView(view.rootView());
 
         setSupportActionBar(view.toolbar());
@@ -52,5 +56,6 @@ public class WebViewActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         view.contentWebView().destroy();
+        view.webViewNestedScrollView().removeAllViews();
     }
 }

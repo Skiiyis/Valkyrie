@@ -16,24 +16,32 @@ public class ZhiHuApi extends BaseApi {
 
     public static Observable<ZhiHuNewsLatestResponse> newsLatest() {
         return retrofit(HOST)
-                .create(NewsLatestService.class)
+                .create(NewsService.class)
                 .newsLatest();
     }
 
     public static Observable<ZhiHuNewsDetailResponse> newsDetail(String id) {
         return retrofit(HOST)
-                .create(NewsDetailService.class)
+                .create(NewsService.class)
                 .newsDetail(id);
     }
 
     //http://news-at.zhihu.com/api/4/news/3892357
-    public interface NewsDetailService {
-        @GET("{id}")
-        Observable<ZhiHuNewsDetailResponse> newsDetail(@Path("id") String id);
-    }
+    public interface NewsService {
 
-    public interface NewsLatestService {
+        /**
+         * 知乎最新新闻
+         * @return
+         */
         @GET("latest")
         Observable<ZhiHuNewsLatestResponse> newsLatest();
+
+        /**
+         * 详情
+         * @param id
+         * @return
+         */
+        @GET("{id}")
+        Observable<ZhiHuNewsDetailResponse> newsDetail(@Path("id") String id);
     }
 }

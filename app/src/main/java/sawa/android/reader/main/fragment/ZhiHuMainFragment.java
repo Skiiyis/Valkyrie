@@ -29,11 +29,12 @@ public class ZhiHuMainFragment extends BaseFragment {
 
     @Override
     protected void onInflated(final View contentView) {
-
+        viewRecycleViewWrapper = new ViewRecycleViewWrapper(contentView);
         NewsLatestZhiHuViewObserver observer = new NewsLatestZhiHuViewObserver(ZhiHuMainFragment.this);
 
         Observable.just(CACHE_KEY)
                 .observeOn(Schedulers.io())
+                .compose(this.<String>bindToLifecycle())
                 .map(new Function<String, ZhiHuNewsLatestResponse>() {
                     @Override
                     public ZhiHuNewsLatestResponse apply(String key) throws Exception {
@@ -44,13 +45,8 @@ public class ZhiHuMainFragment extends BaseFragment {
                 .subscribe(observer);
 
         Observable.just(0)
-                .doOnNext(new Consumer<Integer>() {
-                    @Override
-                    public void accept(Integer integer) throws Exception {
-                        viewRecycleViewWrapper = new ViewRecycleViewWrapper(contentView);
-                    }
-                })
                 .observeOn(Schedulers.io())
+                .compose(this.<Integer>bindToLifecycle())
                 .flatMap(new Function<Integer, Observable<ZhiHuNewsLatestResponse>>() {
                     @Override
                     public Observable<ZhiHuNewsLatestResponse> apply(Integer integer) throws Exception {

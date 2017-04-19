@@ -1,6 +1,7 @@
 package sawa.android.reader.webview;
 
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.webkit.WebView;
@@ -20,7 +21,11 @@ public class WebViewActivityViewWrapper extends BaseViewWrapper {
     }
 
     public WebView contentWebView() {
-        return (WebView) rootView().findViewById(R.id.wv_content);
+        return (WebView) webViewNestedScrollView().getChildAt(0);
+    }
+
+    public NestedScrollView webViewNestedScrollView() {
+        return (NestedScrollView) rootView().findViewById(R.id.nsv_wv_content);
     }
 
     public PlusImageView headerImageView() {

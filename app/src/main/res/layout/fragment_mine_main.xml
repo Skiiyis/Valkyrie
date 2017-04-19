@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/write_pure"
+        android:orientation="vertical">
+
+        <sawa.android.reader.common.PlusImageView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/color_primary"
+            android:padding="20dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="15dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="收藏"
+                android:textColor="@color/font_secondary"
+                android:textSize="@dimen/text_larger" />
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="2dp"
+                app:cardUseCompatPadding="true">
+
+                <LinearLayout
+                    android:id="@+id/ll_favorite"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_my_music"
+                        style="@style/mine_item_text"
+                        android:drawableLeft="@drawable/ic_star_music"
+                        android:text="我的歌曲" />
+
+                    <include layout="@layout/view_line_halfdp" />
+
+                    <TextView
+                        android:id="@+id/tv_my_music_list"
+                        style="@style/mine_item_text"
+                        android:drawableLeft="@drawable/ic_music_list"
+                        android:text="我的歌单" />
+
+                    <include layout="@layout/view_line_halfdp" />
+
+                    <TextView
+                        android:id="@+id/tv_my_article"
+                        style="@style/mine_item_text"
+                        android:drawableLeft="@drawable/ic_article"
+                        android:text="我的文章" />
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="设置"
+                android:textColor="@color/font_secondary"
+                android:textSize="@dimen/text_larger" />
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="2dp"
+                app:cardUseCompatPadding="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/mine_item_text"
+                        android:drawableLeft="@drawable/ic_clear_cache"
+                        android:text="清除缓存" />
+
+                    <include layout="@layout/view_line_halfdp" />
+
+                    <TextView
+                        style="@style/mine_item_text"
+                        android:drawableLeft="@drawable/ic_feed_back"
+                        android:text="意见反馈" />
+
+                    <include layout="@layout/view_line_halfdp" />
+
+                    <TextView
+                        style="@style/mine_item_text"
+                        android:drawableLeft="@drawable/ic_about"
+                        android:text="关于" />
+
+                    <include layout="@layout/view_line_halfdp" />
+
+                    <TextView
+                        style="@style/mine_item_text"
+                        android:drawableLeft="@drawable/ic_thanks"
+                        android:text="开源协议" />
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+        </LinearLayout>
+    </LinearLayout>

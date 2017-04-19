@@ -96,4 +96,5 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="title_activity_web_view">WebViewActivity</string>
+    <string name="title_activity_live_detail">LiveDetailActivity</string>
 </resources>

@@ -12,6 +12,8 @@ import android.widget.RadioGroup;
 import sawa.android.reader.R;
 import sawa.android.reader.common.BaseActivity;
 import sawa.android.reader.main.fragment.DouBanFMMainFragment;
+import sawa.android.reader.main.fragment.LiveMainFragment;
+import sawa.android.reader.main.fragment.MineMainFragment;
 import sawa.android.reader.main.fragment.ZhiHuMainFragment;
 import sawa.android.reader.main.view_wrapper.MainActivityViewWrapper;
 
@@ -84,8 +86,10 @@ public class MainActivity extends BaseActivity {
                     return new ZhiHuMainFragment();
                 case 1:
                     return new DouBanFMMainFragment();
+                case 2:
+                    return new LiveMainFragment();
                 default:
-                    return new ZhiHuMainFragment();
+                    return new MineMainFragment();
             }
         }
 

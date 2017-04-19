@@ -22,7 +22,7 @@ public class DouBanFMApi extends BaseApi {
 
     public static Observable<List<DouBanFMChannel>> channelList() {
         return retrofit(HOST)
-                .create(ChannelListService.class)
+                .create(SongService.class)
                 .channelList()
                 .map(new Function<DouBanFMChannelsResponse, List<DouBanFMChannel>>() {
                     @Override
@@ -36,7 +36,7 @@ public class DouBanFMApi extends BaseApi {
 
     public static Observable<List<DouBanFMSongList>> songList() {
         return retrofit(HOST)
-                .create(SongListService.class)
+                .create(SongService.class)
                 .songList()
                 .map(new Function<DouBanFMSongListResponse, List<DouBanFMSongList>>() {
                     @Override
@@ -52,34 +52,29 @@ public class DouBanFMApi extends BaseApi {
 
     public static Observable<DouBanFMSongListDetail> songListDetail(String songListId) {
         return retrofit(HOST)
-                .create(SongListDetailService.class)
+                .create(SongService.class)
                 .songListDetail(songListId);
     }
 
-    /**
-     * 豆瓣FM歌单详情
-     */
-    public interface SongListDetailService {
+    public interface SongService {
+        /**
+         * 豆瓣FM歌单详情
+         */
         @GET("songlist/{id}/detail")
         Observable<DouBanFMSongListDetail> songListDetail(@Path("id") String songListId);
-    }
 
-    /**
-     * 豆瓣FM歌单列表
-     */
-    public interface SongListService {
+        /**
+         * 豆瓣FM歌单列表
+         */
         @GET("songlist/selections_v2")
         Observable<DouBanFMSongListResponse> songList();
-    }
 
-    /**
-     * 豆瓣FM频道列表
-     */
-    public interface ChannelListService {
+        /**
+         * 豆瓣FM频道列表
+         */
         @GET("app_channels")
         Observable<DouBanFMChannelsResponse> channelList();
     }
-
 
     public static class DouBanFMSongListResponse implements Serializable {
 
