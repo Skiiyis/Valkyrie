@@ -1,6 +1,8 @@
 package sawa.android.reader.maxjia.activity;
 
-import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,8 +10,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import sawa.android.live.inter.IRenderView;
+import sawa.android.live.view.IjkVideoView;
 import sawa.android.reader.R;
-import sawa.android.reader.main.bean.LiveListItem;
+import sawa.android.reader.global.Application;
 
 public class LiveDetailActivity extends AppCompatActivity {
 
@@ -28,9 +32,18 @@ public class LiveDetailActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        IjkVideoView liveView = (IjkVideoView) findViewById(R.id.live_view);
+        liveView.setAspectRatio(IRenderView.AR_ASPECT_FILL_PARENT);
+        liveView.setVideoURI(Uri.parse(getIntent().getStringExtra("url")));
+        liveView.start();
     }
 
-    public static void launch(Activity activity, LiveListItem.UrlInfo urlInfo){
-
+    public static void launch(String url) {
+        Context context = Application.get();
+        Intent intent = new Intent(context, LiveDetailActivity.class);
+        intent.putExtra("url", url);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
 }

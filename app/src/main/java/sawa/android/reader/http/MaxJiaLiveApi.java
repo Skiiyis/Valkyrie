@@ -22,7 +22,7 @@ public class MaxJiaLiveApi extends BaseApi {
     public static Observable<List<LiveListItem>> liveList(int offset, int limit, String gameType) {
         return retrofit(HOST)
                 .create(LiveService.class)
-                .liveList(offset, limit, gameType)
+                .liveList(offset, limit, gameType, "douyu")
                 .map(new Function<LiveListItemResponse, List<LiveListItem>>() {
                     @Override
                     public List<LiveListItem> apply(LiveListItemResponse response) throws Exception {
@@ -86,7 +86,7 @@ public class MaxJiaLiveApi extends BaseApi {
     /**
      * 响应结果
      */
-    private static class LiveListItemResponse implements Serializable{
+    private static class LiveListItemResponse implements Serializable {
 
         private String msg;
         private String status;

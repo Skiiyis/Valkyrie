@@ -20,6 +20,7 @@ import sawa.android.reader.http.MaxJiaLiveApi;
 import sawa.android.reader.main.bean.LiveListItem;
 import sawa.android.reader.main.view_wrapper.LiveMainViewWrapper;
 import sawa.android.reader.main.view_wrapper.ViewRecycleViewWrapper;
+import sawa.android.reader.maxjia.activity.LiveDetailActivity;
 
 /**
  * Created by mc100 on 2017/4/19.
@@ -104,7 +105,7 @@ public class LiveMainFragment extends BaseFragment {
             view.rootView().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    
+                    LiveDetailActivity.launch("rtmp://live.hkstv.hk.lxdns.com/live/hks");
                 }
             });
         }
