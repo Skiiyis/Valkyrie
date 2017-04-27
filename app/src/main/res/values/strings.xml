@@ -97,4 +97,5 @@
     </string>
     <string name="title_activity_web_view">WebViewActivity</string>
     <string name="title_activity_live_detail">LiveDetailActivity</string>
+    <string name="title_activity_main2">Main2Activity</string>
 </resources>

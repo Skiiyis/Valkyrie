@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:background="@color/color_primary">
+
+    <ImageView
+        android:id="@+id/iv_menu"
+        android:layout_width="40dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="-6dp"
+        android:layout_marginBottom="4dp"
+        android:padding="6dp"
+        android:src="@drawable/ic_menu" />
+
+    <RadioGroup
+        android:id="@+id/rg_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="6"
+        tools:showIn="@layout/activity_main">
+
+        <RadioButton
+            style="@style/main_bottom_button"
+            android:layout_marginBottom="8dp"
+            android:drawableBottom="@drawable/selector_ic_home_compass" />
+
+        <RadioButton
+            style="@style/main_bottom_button"
+            android:layout_marginBottom="8dp"
+            android:drawableBottom="@drawable/selector_ic_home_music" />
+
+        <RadioButton
+            style="@style/main_bottom_button"
+            android:layout_marginBottom="8dp"
+            android:drawableBottom="@drawable/selector_ic_home_live" />
+
+        <!--<RadioButton
+            style="@style/main_bottom_button"
+            android:drawableLeft="@drawable/selector_ic_home_mine" />-->
+    </RadioGroup>
+
+</FrameLayout>

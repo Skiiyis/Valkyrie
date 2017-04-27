@@ -2,6 +2,7 @@ package sawa.android.reader.douban.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -115,6 +116,10 @@ public class DouBanFMSongListActivity extends BaseActivity {
         viewWrapper.collectedCountTextView().setVisibility(View.VISIBLE);
         viewWrapper.containerRecycleView().setLayoutManager(new LinearLayoutManager(this));
         viewWrapper.containerRecycleView().setAdapter(new DouBanFMSongListDetailAdapter(this, detail));
+
+        viewWrapper.toolbarLayout().setTitle(detail.getTitle());
+        viewWrapper.toolbarLayout().setCollapsedTitleTextColor(Color.WHITE);
+        viewWrapper.toolbarLayout().setExpandedTitleColor(Color.TRANSPARENT);
     }
 
     /**
@@ -277,6 +282,16 @@ public class DouBanFMSongListActivity extends BaseActivity {
                                 MUSIC_PLAY_MANAGER.playList(detail, position);
                             }
                             activity.get().initActionBar(detail);
+                        }
+                    });
+
+            RxView.clicks(view.moreImageView())
+                    .compose(activity.get().bindToLifecycle())
+                    .throttleFirst(1, TimeUnit.SECONDS)
+                    .subscribe(new Consumer<Object>() {
+                        @Override
+                        public void accept(Object o) throws Exception {
+
                         }
                     });
 

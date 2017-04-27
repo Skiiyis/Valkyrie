@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            style="@style/main_bottom_button"
+            android:text="歌单"
+            android:textColor="@drawable/selector_tab_text_color" />
+
+        <RadioButton
+            style="@style/main_bottom_button"
+            android:text="频道"
+            android:textColor="@drawable/selector_tab_text_color" />
+
+        <RadioButton
+            style="@style/main_bottom_button"
+            android:text="我的"
+            android:textColor="@drawable/selector_tab_text_color" />
+
+    </RadioGroup>
+
+    <include layout="@layout/view_line_halfdp" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vp_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>

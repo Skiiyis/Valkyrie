@@ -1,10 +1,14 @@
 package sawa.android.reader.main.activity;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -17,7 +21,7 @@ import sawa.android.reader.main.fragment.MineMainFragment;
 import sawa.android.reader.main.fragment.ZhiHuMainFragment;
 import sawa.android.reader.main.view_wrapper.MainActivityViewWrapper;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private int currentChecked = 0;
 
@@ -31,6 +35,23 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         final MainActivityViewWrapper mainActivityViewWrapper = new MainActivityViewWrapper(View.inflate(this, R.layout.activity_main, null));
         setContentView(mainActivityViewWrapper.rootView());
+
+        setSupportActionBar(mainActivityViewWrapper.toolbar());
+        mainActivityViewWrapper.toolbar().setTitle("");
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        mainActivityViewWrapper.MenuImageView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mainActivityViewWrapper.drawerLayout().openDrawer(GravityCompat.START);
+            }
+        });
+
 
         mainActivityViewWrapper.containerViewPager().setAdapter(new MainFragmentAdapter(getSupportFragmentManager()));
         mainActivityViewWrapper.buttonRadioGroup().setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -70,6 +91,11 @@ public class MainActivity extends BaseActivity {
         mainActivityViewWrapper.containerViewPager().setOffscreenPageLimit(3);
     }
 
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        return false;
+    }
+
     /**
      * 首页Adapter
      */
@@ -95,7 +121,7 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public int getCount() {
-            return 4;
+            return 3;
         }
     }
 }

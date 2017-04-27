@@ -1,29 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="功能">
+    <item android:title="设置">
         <menu>
             <item
-                android:id="@+id/nav_fav"
-                android:icon="@mipmap/ic_favorite_border_black_24dp"
-                android:title="收藏" />
-            <item
-                android:id="@+id/nav_setting"
-                android:icon="@mipmap/ic_tune_black_24dp"
-                android:title="设置" />
-        </menu>
-    </item>
+                android:id="@+id/nav_clean"
+                android:icon="@drawable/ic_clear_cache"
+                android:title="清除缓存" />
 
-    <item android:title="其他">
-        <menu>
             <item
-                android:id="@+id/nav_night_mode"
-                android:icon="@mipmap/ic_brightness_2_black_24dp"
-                android:title="夜间模式" />
+                android:id="@+id/nav_feed_back"
+                android:icon="@drawable/ic_feed_back"
+                android:title="意见反馈" />
+
             <item
-                android:id="@+id/nav_author"
-                android:icon="@mipmap/ic_person_black_24dp"
+                android:id="@+id/nav_about"
+                android:icon="@drawable/ic_about"
                 android:title="关于作者" />
+
+            <item
+                android:id="@+id/nav_thanks"
+                android:icon="@drawable/ic_thanks"
+                android:title="开源协议" />
+
         </menu>
     </item>
 </menu>

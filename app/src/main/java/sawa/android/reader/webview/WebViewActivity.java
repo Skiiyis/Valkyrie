@@ -2,14 +2,22 @@ package sawa.android.reader.webview;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.NestedScrollView;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import sawa.android.reader.R;
+import sawa.android.reader.R2;
 import sawa.android.reader.common.BaseActivity;
+import sawa.android.reader.common.PlusImageView;
 
 /**
  * Created by hasee on 2017/3/19.
