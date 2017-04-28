@@ -4,25 +4,30 @@ import android.app.Service;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import sawa.android.reader.global.Application;
+import sawa.android.reader.douban.bean.DouBanFMSongListDetail;
 import sawa.android.reader.util.LogUtil;
 
 /**
  * Created by mc100 on 2017/4/14.
  */
 
-public class MusicPlayService extends Service {
+public class MusicPlayService extends Service implements IMusicPlay {
 
     private MediaPlayer player = new MediaPlayer();
-    private static final String ACTION_PLAY = "play";
-    private static final String ACTION_REPLAY = "replay";
-    private static final String ACTION_PAUSE = "pause";
+    private List<DouBanFMSongListDetail.Song> songList = new ArrayList<>();
+    private List<DouBanFMSongListDetail.Song> songList$ = new ArrayList<>();
+    private String playMode = MusicPlayMode.LIST_LOOP;
+    private String playStatus = MusicPlayStatus.STOP;
+    private DouBanFMSongListDetail.Song currentSong;
 
     @Nullable
     @Override
@@ -32,38 +37,7 @@ public class MusicPlayService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String url = intent.getStringExtra("url");
-        String action = intent.getStringExtra("action");
-        if (ACTION_PLAY.equals(action)) {
-            if (TextUtils.isEmpty(url)) {
-                return super.onStartCommand(intent, flags, startId);
-            }
-            play(url);
-        } else if (ACTION_PAUSE.equals(action)) {
-            pause();
-        } else if (ACTION_REPLAY.equals(action)) {
-            replay();
-        }
         return super.onStartCommand(intent, Service.START_REDELIVER_INTENT, startId);
-    }
-
-    public static void startPlay(String url) {
-        Intent intent = new Intent(Application.get(), MusicPlayService.class);
-        intent.putExtra("action", ACTION_PLAY);
-        intent.putExtra("url", url);
-        Application.get().startService(intent);
-    }
-
-    public static void startPause() {
-        Intent intent = new Intent(Application.get(), MusicPlayService.class);
-        intent.putExtra("action", ACTION_PAUSE);
-        Application.get().startService(intent);
-    }
-
-    public static void startReplay() {
-        Intent intent = new Intent(Application.get(), MusicPlayService.class);
-        intent.putExtra("action", ACTION_REPLAY);
-        Application.get().startService(intent);
     }
 
     private void play(String url) {
@@ -74,26 +48,129 @@ public class MusicPlayService extends Service {
             player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
-                    mp.start();
+                    if (!MusicPlayStatus.PLAYING.equals(playStatus)) {
+                        mp.start();
+                        playStatus = MusicPlayStatus.PLAYING;
+                    }
                 }
             });
+
             player.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
                 @Override
                 public void onBufferingUpdate(MediaPlayer mp, int percent) {
-                    mp.start();
+
                 }
             });
+
+            player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    return false;
+                }
+            });
+
+            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    next();
+                }
+            });
+
             player.prepareAsync();
         } catch (IOException e) {
             LogUtil.e(e);
         }
     }
 
-    private void replay() {
-        player.start();
+    @Override
+    public void play() {
+        switch (playStatus) {
+            case MusicPlayStatus.STOP:
+                player.prepareAsync();
+                break;
+            case MusicPlayStatus.PAUSE:
+                player.start();
+                break;
+            case MusicPlayStatus.PLAYING:
+                break;
+        }
     }
 
-    private void pause() {
+    @Override
+    public void play(DouBanFMSongListDetail.Song song) {
+        add(song);
+        this.currentSong = song;
+        play(song.getUrl());
+    }
+
+    @Override
+    public void play(int position) {
+        if (position < songList.size()) {
+            DouBanFMSongListDetail.Song song = songList.get(position);
+            this.currentSong = song;
+            play(currentSong.getUrl());
+        }
+    }
+
+    @Override
+    public void pause() {
         player.pause();
+        this.playStatus = MusicPlayStatus.PAUSE;
+    }
+
+    @Override
+    public void stop() {
+        player.stop();
+        this.playStatus = MusicPlayStatus.STOP;
+    }
+
+    @Override
+    public void clearPlayList() {
+        this.songList.clear();
+        this.songList$.clear();
+    }
+
+    @Override
+    public void add(DouBanFMSongListDetail.Song song) {
+        this.songList.add(0, song);
+        this.songList$.add(0, song);
+    }
+
+    @Override
+    public void add(List<DouBanFMSongListDetail.Song> songList) {
+        this.songList.addAll(songList);
+        this.songList$.addAll(songList);
+    }
+
+    @Override
+    public void setPlayMode(@MusicPlayMode String playMode) {
+        this.playMode = playMode;
+        player.setLooping(false);
+        songList$.clear();
+        songList$.addAll(songList);
+        if (MusicPlayMode.LIST_RANDOM.equals(playMode)) {
+            Collections.shuffle(songList$);
+        } else if (MusicPlayMode.SINGLE_LOOP.equals(playMode)) {
+            player.setLooping(true);
+        }
+    }
+
+    @Override
+    public void next() {
+        int currentPosition = songList$.indexOf(currentSong);
+        currentSong = songList$.get((currentPosition + songList$.size() + 1) % songList$.size());
+        play(currentSong.getUrl());
+    }
+
+    @Override
+    public void prev() {
+        int currentPosition = songList$.indexOf(currentSong);
+        currentSong = songList$.get((currentPosition + songList$.size() - 1) % songList$.size());
+        play(currentSong.getUrl());
+    }
+
+    @Override
+    public void seek(int percent) {
+
     }
 }

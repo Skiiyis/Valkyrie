@@ -59,7 +59,7 @@ public enum MusicPlayManager {
             return;
         }
         currentPlayIndex = index;
-        MusicPlayService.startPlay(this.playList.get(index).getUrl());
+        //MusicPlayService.startPlay(this.playList.get(index).getUrl());
         isPlaying = true;
     }
 
@@ -89,12 +89,12 @@ public enum MusicPlayManager {
     }
 
     public void pause() {
-        MusicPlayService.startPause();
+        //MusicPlayService.startPause();
         isPlaying = false;
     }
 
     public void replay() {
-        MusicPlayService.startReplay();
+        //MusicPlayService.startReplay();
         isPlaying = true;
     }
 }

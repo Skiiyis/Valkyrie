@@ -3,13 +3,17 @@ package sawa.android.reader.douban.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.PopupWindow;
 
 import com.blankj.utilcode.utils.ToastUtils;
 import com.jakewharton.rxbinding2.view.RxView;
@@ -27,6 +31,7 @@ import sawa.android.reader.common.BaseActivity;
 import sawa.android.reader.common.DefaultObserver;
 import sawa.android.reader.douban.bean.DouBanFMSongListDetail;
 import sawa.android.reader.douban.view_model.DouBanFMSongListDetailItemViewModel;
+import sawa.android.reader.douban.view_wrapper.DouBanFMSongDetailPopupWindowViewWrapper;
 import sawa.android.reader.douban.view_wrapper.DouBanFMSongListActivityViewWrapper;
 import sawa.android.reader.douban.view_wrapper.DouBanFMSongListDetailItemViewWrapper;
 import sawa.android.reader.global.Application;
@@ -35,6 +40,8 @@ import sawa.android.reader.util.CacheUtil;
 import sawa.android.reader.util.LogUtil;
 import sawa.android.reader.util.StarUtil;
 
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static sawa.android.reader.music.MusicPlayManager.MUSIC_PLAY_MANAGER;
 
 /**
@@ -268,7 +275,7 @@ public class DouBanFMSongListActivity extends BaseActivity {
                             /**
                              * magic
                              */
-                            if (MUSIC_PLAY_MANAGER.isSameList(detail.getId())) {
+                            /*if (MUSIC_PLAY_MANAGER.isSameList(detail.getId())) {
                                 if (MUSIC_PLAY_MANAGER.isPlaying(position)) {
                                     if (MUSIC_PLAY_MANAGER.isPlaying()) {
                                         MUSIC_PLAY_MANAGER.pause();
@@ -280,7 +287,7 @@ public class DouBanFMSongListActivity extends BaseActivity {
                                 }
                             } else {
                                 MUSIC_PLAY_MANAGER.playList(detail, position);
-                            }
+                            }*/
                             activity.get().initActionBar(detail);
                         }
                     });
@@ -291,7 +298,7 @@ public class DouBanFMSongListActivity extends BaseActivity {
                     .subscribe(new Consumer<Object>() {
                         @Override
                         public void accept(Object o) throws Exception {
-
+                            activity.get().showSongDetailPopupWindow(detail.getSongs().get(position));
                         }
                     });
 
@@ -301,6 +308,82 @@ public class DouBanFMSongListActivity extends BaseActivity {
         public int getItemCount() {
             return detail.getSongs().size();
         }
+    }
+
+    public void showSongDetailPopupWindow(final DouBanFMSongListDetail.Song song) {
+
+        View rootView = View.inflate(this, R.layout.fragment_douban_fm_song_detail, null);
+        final PopupWindow popupWindow = new PopupWindow(rootView, MATCH_PARENT, WRAP_CONTENT);
+        final DouBanFMSongDetailPopupWindowViewWrapper viewWrapper = new DouBanFMSongDetailPopupWindowViewWrapper(rootView);
+
+        RxView.clicks(viewWrapper.cancelTextView())
+                .compose(this.bindToLifecycle())
+                .subscribe(new Consumer<Object>() {
+                    @Override
+                    public void accept(Object o) throws Exception {
+                        if (popupWindow.isShowing()) {
+                            popupWindow.dismiss();
+                        }
+                    }
+                });
+
+        /**
+         * 如果歌单已star，则unStar后设置checkBox check false
+         * 反之亦然
+         */
+        RxView.clicks(viewWrapper.starImageView())
+                .throttleFirst(1, TimeUnit.SECONDS)
+                .compose(this.bindToLifecycle())
+                .observeOn(Schedulers.io())
+                .map(new Function<Object, Boolean>() {
+                    @Override
+                    public Boolean apply(Object o) throws Exception {
+                        boolean isStar = StarUtil.isStar(song);
+                        boolean result = isStar ? StarUtil.unStar(song) : StarUtil.star(song);
+                        return result ? !isStar : isStar;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean isStar) throws Exception {
+                        viewWrapper.starImageView().setImageResource(isStar ? R.drawable.ic_star_32dp : R.drawable.ic_star_32dp_default);
+                    }
+                });
+
+        Observable.just(song)
+                .compose(this.<DouBanFMSongListDetail.Song>bindToLifecycle())
+                .observeOn(Schedulers.io())
+                .map(new Function<DouBanFMSongListDetail.Song, Boolean>() {
+                    @Override
+                    public Boolean apply(DouBanFMSongListDetail.Song song) throws Exception {
+                        return StarUtil.isStar(song);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean isStar) throws Exception {
+                        viewWrapper.starImageView().setImageResource(isStar ? R.drawable.ic_star_32dp : R.drawable.ic_star_32dp_default);
+                    }
+                });
+        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        popupWindow.setFocusable(true);
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.showAtLocation(viewWrapper.rootView(), Gravity.BOTTOM, 0, 0);
+
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                final WindowManager.LayoutParams wlBackground = getWindow().getAttributes();
+                wlBackground.alpha = 1f;      // 0.0 完全不透明,1.0完全透明
+                getWindow().setAttributes(wlBackground);
+            }
+        });
+
+        final WindowManager.LayoutParams wlBackground = getWindow().getAttributes();
+        wlBackground.alpha = 0.5f;      // 0.0 完全不透明,1.0完全透明
+        getWindow().setAttributes(wlBackground);
     }
 
     @Override

@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.google.gson.Gson;
+
 import sawa.android.reader.db.DataBaseHelper;
 import sawa.android.reader.douban.bean.DouBanFMSongListDetail;
 import sawa.android.reader.main.bean.DouBanFMSongList;
@@ -50,6 +52,7 @@ public class StarUtil {
     }
 
     public static boolean star(DouBanFMSongList songList) {
+        CacheUtil.cache(STAR_TYPE_SONG_LIST + songList.getId(), new Gson().toJson(songList));
         return star(songList.getId() + "", STAR_TYPE_SONG_LIST);
     }
 
@@ -58,10 +61,12 @@ public class StarUtil {
     }
 
     public static boolean unStar(DouBanFMSongList songList) {
+        CacheUtil.clear(STAR_TYPE_SONG_LIST + songList.getId());
         return unStar(songList.getId() + "", STAR_TYPE_SONG_LIST);
     }
 
     public static boolean star(DouBanFMSongListDetail.Song song) {
+        CacheUtil.cache(STAR_TYPE_SONG + song.getSid(), new Gson().toJson(song));
         return star(song.getSid() + "", STAR_TYPE_SONG);
     }
 
@@ -70,6 +75,7 @@ public class StarUtil {
     }
 
     public static boolean unStar(DouBanFMSongListDetail.Song song) {
+        CacheUtil.clear(STAR_TYPE_SONG + song.getSid());
         return unStar(song.getSid() + "", STAR_TYPE_SONG);
     }
 }

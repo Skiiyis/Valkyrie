@@ -2,9 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Reader.iml" filepath="$PROJECT_DIR$/Reader.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/live/live.iml" filepath="$PROJECT_DIR$/live/live.iml" />
-      <module fileurl="file://$PROJECT_DIR$/reader.iml" filepath="$PROJECT_DIR$/reader.iml" />
+      <module fileurl="file://$PROJECT_DIR$/live/live.iml" filepath="$PROJECT_DIR$/live/live.iml" />
+      <module fileurl="file://$PROJECT_DIR$/musicplay/musicplay.iml" filepath="$PROJECT_DIR$/musicplay/musicplay.iml" />
     </modules>
   </component>
 </project>

@@ -20,6 +20,9 @@
     <dimen name="text_larger">16dp</dimen>
     <dimen name="text_largest">20dp</dimen>
 
+    <dimen name="size_8dp">8dp</dimen>
+    <dimen name="size_10dp">10dp</dimen>
+
     <dimen name="home_icon_height">32dp</dimen>
     <dimen name="home_icon_width">32dp</dimen>
 </resources>

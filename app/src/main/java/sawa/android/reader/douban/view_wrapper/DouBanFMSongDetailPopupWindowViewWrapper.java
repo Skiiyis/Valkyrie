@@ -12,22 +12,10 @@ import sawa.android.reader.common.PlusImageView;
  * Created by mc100 on 2017/4/12.
  */
 
-public class DouBanFMSongDetailDialogFragmentViewWrapper extends BaseViewWrapper {
+public class DouBanFMSongDetailPopupWindowViewWrapper extends BaseViewWrapper {
 
-    public DouBanFMSongDetailDialogFragmentViewWrapper(View rootView) {
+    public DouBanFMSongDetailPopupWindowViewWrapper(View rootView) {
         super(rootView);
-    }
-
-    public PlusImageView coverImageView() {
-        return (PlusImageView) rootView().findViewById(R.id.pv_cover);
-    }
-
-    public TextView titleTextView() {
-        return (TextView) rootView().findViewById(R.id.tv_title);
-    }
-
-    public TextView creatorNameTextView() {
-        return (TextView) rootView().findViewById(R.id.tv_creator);
     }
 
     public ImageView starImageView() {
