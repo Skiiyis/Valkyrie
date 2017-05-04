@@ -31,7 +31,9 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".douban.activity.DouBanFMSongListActivity" />
 
-        <service android:name=".music.MusicPlayService" />
+        <service
+            android:name=".music.MusicPlayService"
+            android:process="sawa.android.reader.music" />
 
         <activity
             android:name=".maxjia.activity.LiveDetailActivity"

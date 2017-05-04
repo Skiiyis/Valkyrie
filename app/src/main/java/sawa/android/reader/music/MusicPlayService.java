@@ -2,32 +2,56 @@ package sawa.android.reader.music;
 
 import android.app.Service;
 import android.content.Intent;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import sawa.android.musicplay.AbsMusicPlayer;
+import sawa.android.musicplay.constants.MusicPlayMode;
+import sawa.android.musicplay.inter.IMusicPlay;
 import sawa.android.reader.douban.bean.DouBanFMSongListDetail;
+import sawa.android.reader.util.BroadcastUtil;
 import sawa.android.reader.util.LogUtil;
 
 /**
  * Created by mc100 on 2017/4/14.
  */
 
-public class MusicPlayService extends Service implements IMusicPlay {
+public class MusicPlayService extends Service implements IMusicPlay<DouBanFMSongListDetail.Song> {
 
-    private MediaPlayer player = new MediaPlayer();
-    private List<DouBanFMSongListDetail.Song> songList = new ArrayList<>();
-    private List<DouBanFMSongListDetail.Song> songList$ = new ArrayList<>();
-    private String playMode = MusicPlayMode.LIST_LOOP;
-    private String playStatus = MusicPlayStatus.STOP;
-    private DouBanFMSongListDetail.Song currentSong;
+    public static final String ACTION_REPLAY = "rePlay";
+    public static final String ACTION_PAUSE = "pause";
+    public static final String ACTION_STOP = "stop";
+
+    public static final String ACTION_NEXT = "next";
+    public static final String ACTION_PREV = "prev";
+    public static final String ACTION_TO = "to";
+
+    public static final String ACTION_SET_PLAY_MODE = "setPlayMode";
+
+    public static final String ACTION_ADD = "add";
+    public static final String ACTION_CLEAR = "clear";
+    public static final String ACTION_POSITION = "position";
+    public static final String ACTION_LIST = "list";
+
+    public static final String ACTION_SEEK = "seek";
+    public static final String ACTION_STATUS = "status";
+
+    private AbsMusicPlayer<DouBanFMSongListDetail.Song> musicPlayer;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        musicPlayer = new AbsMusicPlayer<DouBanFMSongListDetail.Song>() {
+
+            @Override
+            public String getSource(DouBanFMSongListDetail.Song song) {
+                return song.getUrl();
+            }
+        };
+    }
 
     @Nullable
     @Override
@@ -37,140 +61,142 @@ public class MusicPlayService extends Service implements IMusicPlay {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        String action = intent.getStringExtra("action");
+
+        switch (action) {
+            case ACTION_REPLAY:
+                rePlay();
+                BroadcastUtil.global().sendBroadcast(ACTION_REPLAY);
+                break;
+            case ACTION_PAUSE:
+                pause();
+                BroadcastUtil.global().sendBroadcast(ACTION_PAUSE);
+                break;
+            case ACTION_STOP:
+                stop();
+                BroadcastUtil.global().sendBroadcast(ACTION_STOP);
+                break;
+            case ACTION_ADD:
+                LogUtil.e("add:" + System.currentTimeMillis());
+                List<DouBanFMSongListDetail.Song> songs = (List<DouBanFMSongListDetail.Song>) intent.getSerializableExtra("songList");
+                if (songs != null && songs.size() != 0) {
+                    add(songs);
+                    BroadcastUtil.global().sendBroadcast(new Intent(ACTION_ADD));
+                }
+                break;
+            case ACTION_CLEAR:
+                LogUtil.e("clear:" + System.currentTimeMillis());
+                BroadcastUtil.global().sendBroadcast(ACTION_CLEAR);
+                break;
+            case ACTION_NEXT:
+                DouBanFMSongListDetail.Song next = next();
+                BroadcastUtil.global().sendBroadcast(new Intent(ACTION_NEXT).putExtra("song", next));
+                break;
+            case ACTION_PREV:
+                DouBanFMSongListDetail.Song prev = prev();
+                BroadcastUtil.global().sendBroadcast(new Intent(ACTION_NEXT).putExtra("song", prev));
+                break;
+            case ACTION_TO:
+                LogUtil.e("to:" + System.currentTimeMillis());
+                int toPosition = intent.getIntExtra("to", -1);
+                if (toPosition != -1 && toPosition > 0) {
+                    DouBanFMSongListDetail.Song to = to(toPosition);
+                    BroadcastUtil.global().sendBroadcast(new Intent(ACTION_TO).putExtra("song", to));
+                }
+                break;
+            case ACTION_SEEK:
+                int seek = intent.getIntExtra("seek", -1);
+                if (seek != -1) {
+                    seek(seek);
+                }
+                BroadcastUtil.global().sendBroadcast(ACTION_SEEK);
+                break;
+            case ACTION_SET_PLAY_MODE:
+                setPlayMode(intent.getStringExtra("playMode"));
+                BroadcastUtil.global().sendBroadcast(ACTION_SET_PLAY_MODE);
+                break;
+            case ACTION_LIST:
+                ArrayList<DouBanFMSongListDetail.Song> list = new ArrayList<>();
+                list.addAll(list());
+                BroadcastUtil.global().sendBroadcast(new Intent(ACTION_LIST).putExtra("list", list));
+                break;
+            case ACTION_STATUS:
+                BroadcastUtil.global().sendBroadcast(new Intent(ACTION_STATUS).putExtra("status", status()));
+                break;
+            case ACTION_POSITION:
+                BroadcastUtil.global().sendBroadcast(new Intent(ACTION_POSITION).putExtra("position", new Integer(position())));
+                break;
+        }
         return super.onStartCommand(intent, Service.START_REDELIVER_INTENT, startId);
-    }
-
-    private void play(String url) {
-        try {
-            player.reset();
-            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            player.setDataSource(url);
-            player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    if (!MusicPlayStatus.PLAYING.equals(playStatus)) {
-                        mp.start();
-                        playStatus = MusicPlayStatus.PLAYING;
-                    }
-                }
-            });
-
-            player.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
-                @Override
-                public void onBufferingUpdate(MediaPlayer mp, int percent) {
-
-                }
-            });
-
-            player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-                @Override
-                public boolean onError(MediaPlayer mp, int what, int extra) {
-                    return false;
-                }
-            });
-
-            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    next();
-                }
-            });
-
-            player.prepareAsync();
-        } catch (IOException e) {
-            LogUtil.e(e);
-        }
-    }
-
-    @Override
-    public void play() {
-        switch (playStatus) {
-            case MusicPlayStatus.STOP:
-                player.prepareAsync();
-                break;
-            case MusicPlayStatus.PAUSE:
-                player.start();
-                break;
-            case MusicPlayStatus.PLAYING:
-                break;
-        }
-    }
-
-    @Override
-    public void play(DouBanFMSongListDetail.Song song) {
-        add(song);
-        this.currentSong = song;
-        play(song.getUrl());
-    }
-
-    @Override
-    public void play(int position) {
-        if (position < songList.size()) {
-            DouBanFMSongListDetail.Song song = songList.get(position);
-            this.currentSong = song;
-            play(currentSong.getUrl());
-        }
-    }
-
-    @Override
-    public void pause() {
-        player.pause();
-        this.playStatus = MusicPlayStatus.PAUSE;
-    }
-
-    @Override
-    public void stop() {
-        player.stop();
-        this.playStatus = MusicPlayStatus.STOP;
-    }
-
-    @Override
-    public void clearPlayList() {
-        this.songList.clear();
-        this.songList$.clear();
-    }
-
-    @Override
-    public void add(DouBanFMSongListDetail.Song song) {
-        this.songList.add(0, song);
-        this.songList$.add(0, song);
-    }
-
-    @Override
-    public void add(List<DouBanFMSongListDetail.Song> songList) {
-        this.songList.addAll(songList);
-        this.songList$.addAll(songList);
     }
 
     @Override
     public void setPlayMode(@MusicPlayMode String playMode) {
-        this.playMode = playMode;
-        player.setLooping(false);
-        songList$.clear();
-        songList$.addAll(songList);
-        if (MusicPlayMode.LIST_RANDOM.equals(playMode)) {
-            Collections.shuffle(songList$);
-        } else if (MusicPlayMode.SINGLE_LOOP.equals(playMode)) {
-            player.setLooping(true);
-        }
+        musicPlayer.setPlayMode(playMode);
     }
 
     @Override
-    public void next() {
-        int currentPosition = songList$.indexOf(currentSong);
-        currentSong = songList$.get((currentPosition + songList$.size() + 1) % songList$.size());
-        play(currentSong.getUrl());
+    public DouBanFMSongListDetail.Song next() {
+        return musicPlayer.next();
     }
 
     @Override
-    public void prev() {
-        int currentPosition = songList$.indexOf(currentSong);
-        currentSong = songList$.get((currentPosition + songList$.size() - 1) % songList$.size());
-        play(currentSong.getUrl());
+    public DouBanFMSongListDetail.Song prev() {
+        return musicPlayer.prev();
+    }
+
+    @Override
+    public DouBanFMSongListDetail.Song to(int position) {
+        return musicPlayer.to(position);
+    }
+
+    @Override
+    public void add(DouBanFMSongListDetail.Song song) {
+        musicPlayer.add(song);
+    }
+
+    @Override
+    public void add(List<DouBanFMSongListDetail.Song> t) {
+        musicPlayer.add(t);
+    }
+
+    @Override
+    public void clear() {
+        musicPlayer.clear();
+    }
+
+    @Override
+    public int position() {
+        return musicPlayer.position();
+    }
+
+    @Override
+    public List<DouBanFMSongListDetail.Song> list() {
+        return musicPlayer.list();
+    }
+
+    @Override
+    public void rePlay() {
+        musicPlayer.rePlay();
+    }
+
+    @Override
+    public void pause() {
+        musicPlayer.pause();
+    }
+
+    @Override
+    public void stop() {
+        musicPlayer.stop();
     }
 
     @Override
     public void seek(int percent) {
+        musicPlayer.seek(percent);
+    }
 
+    @Override
+    public String status() {
+        return musicPlayer.status();
     }
 }

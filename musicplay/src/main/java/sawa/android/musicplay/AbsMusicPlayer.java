@@ -2,6 +2,7 @@ package sawa.android.musicplay;
 
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import sawa.android.musicplay.inter.IMusicPlay;
  */
 public abstract class AbsMusicPlayer<T> implements IMusicPlay<T> {
 
-    protected MediaPlayer player = new MediaPlayer();
+    protected MediaPlayer player;
     public String playStatus = MusicPlayStatus.STOP;
     private IListPolicy<T> listPolicy;
     private List<T> t;
@@ -77,46 +78,62 @@ public abstract class AbsMusicPlayer<T> implements IMusicPlay<T> {
         return listPolicy.position();
     }
 
-    @Override
-    public void play(T t) {
+    private void play(T t) {
         try {
-            player.reset();
-            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            player.setDataSource(getSource(t));
-            player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            if (player == null) {
+                player = new MediaPlayer();
+                player.reset();
+                player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    if (!MusicPlayStatus.PLAYING.equals(playStatus)) {
-                        mp.start();
-                        playStatus = MusicPlayStatus.PLAYING;
+                    @Override
+                    public void onPrepared(MediaPlayer mp) {
+                        if (!MusicPlayStatus.PLAYING.equals(playStatus)) {
+                            mp.start();
+                            playStatus = MusicPlayStatus.PLAYING;
+                        }
                     }
-                }
-            });
+                });
 
-            player.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
-                @Override
-                public void onBufferingUpdate(MediaPlayer mp, int percent) {
+                player.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
+                    @Override
+                    public void onBufferingUpdate(MediaPlayer mp, int percent) {
 
-                }
-            });
+                    }
+                });
 
-            player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-                @Override
-                public boolean onError(MediaPlayer mp, int what, int extra) {
-                    return false;
-                }
-            });
+                player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                    @Override
+                    public boolean onError(MediaPlayer mp, int what, int extra) {
+                        Log.e("error", what + ":" + extra);
+                        player = null;
+                        return false;
+                    }
+                });
 
-            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    play(listPolicy.next());
-                }
-            });
-
+                player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        play(listPolicy.next());
+                    }
+                });
+            }
+            player.reset();
+            player.setDataSource(getSource(t));
             player.prepareAsync();
         } catch (IOException e) {
+        }
+    }
+
+    @Override
+    public void rePlay() {
+        switch (playStatus) {
+            case MusicPlayStatus.PAUSE:
+                player.start();
+                return;
+            case MusicPlayStatus.STOP:
+                to(0);
+                return;
         }
     }
 
@@ -135,6 +152,16 @@ public abstract class AbsMusicPlayer<T> implements IMusicPlay<T> {
     @Override
     public void seek(int percent) {
         player.seekTo(percent);
+    }
+
+    @Override
+    public String status() {
+        return playStatus;
+    }
+
+    @Override
+    public List<T> list() {
+        return listPolicy.list();
     }
 
     public abstract String getSource(T t);

@@ -22,6 +22,7 @@ import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -36,13 +37,13 @@ import sawa.android.reader.douban.view_wrapper.DouBanFMSongListActivityViewWrapp
 import sawa.android.reader.douban.view_wrapper.DouBanFMSongListDetailItemViewWrapper;
 import sawa.android.reader.global.Application;
 import sawa.android.reader.http.DouBanFMApi;
+import sawa.android.reader.music.MusicPlayManager;
 import sawa.android.reader.util.CacheUtil;
 import sawa.android.reader.util.LogUtil;
 import sawa.android.reader.util.StarUtil;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-import static sawa.android.reader.music.MusicPlayManager.MUSIC_PLAY_MANAGER;
 
 /**
  * 豆瓣歌单详情
@@ -149,7 +150,8 @@ public class DouBanFMSongListActivity extends BaseActivity {
                         /**
                          * 如果正在播放音乐并且是本歌单，则显示正在播放，否则显示未播放
                          */
-                        states[1] = MUSIC_PLAY_MANAGER.isPlaying() && MUSIC_PLAY_MANAGER.isSameList(songListDetail.getId());
+                        states[1] = true;
+                        /*states[1] = MUSIC_PLAY_MANAGER.isPlaying() && MUSIC_PLAY_MANAGER.isSameList(songListDetail.getId());*/
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -194,7 +196,7 @@ public class DouBanFMSongListActivity extends BaseActivity {
                 .subscribe(new Consumer<Object>() {
                     @Override
                     public void accept(Object o) throws Exception {
-                        if (states[1]) {
+                        /*if (states[1]) {
                             MUSIC_PLAY_MANAGER.pause();
                         } else {
                             if (MUSIC_PLAY_MANAGER.isPausing() && MUSIC_PLAY_MANAGER.isSameList(songListDetail.getId())) {
@@ -202,7 +204,7 @@ public class DouBanFMSongListActivity extends BaseActivity {
                             } else {
                                 MUSIC_PLAY_MANAGER.playList(songListDetail);
                             }
-                        }
+                        }*/
                         states[1] = !states[1];
                         viewWrapper.playImageView().setImageResource(states[1] ? R.drawable.ic_pause : R.drawable.ic_play);
                     }
@@ -244,6 +246,7 @@ public class DouBanFMSongListActivity extends BaseActivity {
      * 豆瓣歌单详情 adapter
      */
     private static class DouBanFMSongListDetailAdapter extends RecyclerView.Adapter<DouBanFMSongListDetailItemViewWrapper> {
+
         private final WeakReference<DouBanFMSongListActivity> activity;
         private final DouBanFMSongListDetail detail;
 
@@ -266,29 +269,37 @@ public class DouBanFMSongListActivity extends BaseActivity {
             }
             viewModel.bind(detail.getSongs().get(position));
 
+            /**
+             * 这段逻辑有点问题，执行起来不是同步的
+             */
             RxView.clicks(view.rootView())
                     .compose(activity.get().bindToLifecycle())
                     .throttleFirst(1, TimeUnit.SECONDS)
-                    .subscribe(new Consumer<Object>() {
+                    .observeOn(Schedulers.io())
+                    .concatMap(new Function<Object, ObservableSource<Boolean>>() {
                         @Override
-                        public void accept(Object o) throws Exception {
-                            /**
-                             * magic
-                             */
-                            /*if (MUSIC_PLAY_MANAGER.isSameList(detail.getId())) {
-                                if (MUSIC_PLAY_MANAGER.isPlaying(position)) {
-                                    if (MUSIC_PLAY_MANAGER.isPlaying()) {
-                                        MUSIC_PLAY_MANAGER.pause();
-                                    } else if (MUSIC_PLAY_MANAGER.isPausing()) {
-                                        MUSIC_PLAY_MANAGER.replay();
-                                    }
-                                } else {
-                                    MUSIC_PLAY_MANAGER.play(position);
-                                }
-                            } else {
-                                MUSIC_PLAY_MANAGER.playList(detail, position);
-                            }*/
-                            activity.get().initActionBar(detail);
+                        public ObservableSource<Boolean> apply(Object o) throws Exception {
+                            return MusicPlayManager.clear();
+                        }
+                    })
+                    .concatMap(new Function<Boolean, ObservableSource<Boolean>>() {
+                        @Override
+                        public ObservableSource<Boolean> apply(Boolean aBoolean) throws Exception {
+                            return MusicPlayManager.add(detail.getSongs());
+                        }
+                    })
+                    .concatMap(new Function<Boolean, ObservableSource<DouBanFMSongListDetail.Song>>() {
+                        @Override
+                        public ObservableSource<DouBanFMSongListDetail.Song> apply(Boolean aBoolean) throws Exception {
+                            return MusicPlayManager.to(position);
+                        }
+                    })
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<DouBanFMSongListDetail.Song>() {
+                        @Override
+                        public void accept(DouBanFMSongListDetail.Song song) throws Exception {
+                            LogUtil.e("正在播放：" + song.getTitle());
+                            ToastUtils.showShortToast("正在播放：" + song.getTitle());
                         }
                     });
 
@@ -301,7 +312,6 @@ public class DouBanFMSongListActivity extends BaseActivity {
                             activity.get().showSongDetailPopupWindow(detail.getSongs().get(position));
                         }
                     });
-
         }
 
         @Override

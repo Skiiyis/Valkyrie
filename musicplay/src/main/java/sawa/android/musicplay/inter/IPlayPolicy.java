@@ -7,7 +7,7 @@ import sawa.android.musicplay.constants.MusicPlayStatus;
  */
 public interface IPlayPolicy<T> {
 
-    void play(T t);
+    void rePlay();
 
     void pause();
 

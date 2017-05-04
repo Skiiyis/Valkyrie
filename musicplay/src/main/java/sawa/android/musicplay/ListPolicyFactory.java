@@ -20,6 +20,8 @@ public class ListPolicyFactory {
                 return new RandomListPolicy<>(t);
             case MusicPlayMode.SINGLE_LOOP:
                 return new LoopListPolicy<>(t);
+            default:
+                break;
         }
         return null;
     }
@@ -38,6 +40,8 @@ public class ListPolicyFactory {
                 LoopListPolicy<T> tLoopListPolicy = new LoopListPolicy<>(policy.list());
                 tLoopListPolicy.to(policy.position());
                 return tLoopListPolicy;
+            default:
+                break;
         }
         return null;
     }
@@ -58,11 +62,13 @@ public class ListPolicyFactory {
 
         @Override
         public T next() {
+            position = (position + t.size() + 1) % t.size();
             return t.get(position);
         }
 
         @Override
         public T prev() {
+            position = (position + t.size() - 1) % t.size();
             return t.get(position);
         }
 
