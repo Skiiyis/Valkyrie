@@ -79,19 +79,17 @@ public abstract class AbsMusicPlayer<T> implements IMusicPlay<T> {
     }
 
     private void play(T t) {
+        playStatus = MusicPlayStatus.STOP;
         try {
             if (player == null) {
                 player = new MediaPlayer();
-                player.reset();
                 player.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
                     @Override
                     public void onPrepared(MediaPlayer mp) {
-                        if (!MusicPlayStatus.PLAYING.equals(playStatus)) {
-                            mp.start();
-                            playStatus = MusicPlayStatus.PLAYING;
-                        }
+                        mp.start();
+                        playStatus = MusicPlayStatus.PLAYING;
                     }
                 });
 
@@ -122,6 +120,7 @@ public abstract class AbsMusicPlayer<T> implements IMusicPlay<T> {
             player.setDataSource(getSource(t));
             player.prepareAsync();
         } catch (IOException e) {
+            Log.e("MusicPlayer:play", e.getMessage());
         }
     }
 

@@ -1,4 +1,4 @@
-package sawa.android.reader.util;
+package sawa.android.common.util;
 
 import android.graphics.Color;
 import android.view.animation.DecelerateInterpolator;

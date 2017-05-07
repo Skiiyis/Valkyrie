@@ -19,6 +19,7 @@ import com.blankj.utilcode.utils.ToastUtils;
 import com.jakewharton.rxbinding2.view.RxView;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -26,6 +27,7 @@ import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 import sawa.android.reader.R;
 import sawa.android.reader.common.BaseActivity;
@@ -37,9 +39,10 @@ import sawa.android.reader.douban.view_wrapper.DouBanFMSongListActivityViewWrapp
 import sawa.android.reader.douban.view_wrapper.DouBanFMSongListDetailItemViewWrapper;
 import sawa.android.reader.global.Application;
 import sawa.android.reader.http.DouBanFMApi;
-import sawa.android.reader.music.MusicPlayManager;
+import sawa.android.reader.music.MusicPlayHelper;
+import sawa.android.reader.music.MusicPlayService;
 import sawa.android.reader.util.CacheUtil;
-import sawa.android.reader.util.LogUtil;
+import sawa.android.common.util.LogUtil;
 import sawa.android.reader.util.StarUtil;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
@@ -64,7 +67,7 @@ public class DouBanFMSongListActivity extends BaseActivity {
 
         /**
          * 先走离线缓存
-         */
+         *//*
         Observable.just(songListId)
                 .compose(this.<String>bindToLifecycle())
                 .observeOn(Schedulers.io())
@@ -75,7 +78,7 @@ public class DouBanFMSongListActivity extends BaseActivity {
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(detailObserver);
+                .subscribe(detailObserver);*/
 
         /**
          * 拉取线上内容有更新则立即更新UI，并更新缓存
@@ -136,46 +139,16 @@ public class DouBanFMSongListActivity extends BaseActivity {
      * @param songListDetail
      */
     private void initActionBar(final DouBanFMSongListDetail songListDetail) {
-        final Boolean[] states = new Boolean[4];
         /**
-         * 初始化四个按钮的状态
+         * 初始化收藏按钮的状态
          */
         Observable.just(songListDetail)
                 .compose(this.<DouBanFMSongListDetail>bindToLifecycle())
                 .observeOn(Schedulers.io())
-                .doOnNext(new Consumer<DouBanFMSongListDetail>() {
+                .map(new Function<DouBanFMSongListDetail, Boolean>() {
                     @Override
-                    public void accept(DouBanFMSongListDetail songListDetail) throws Exception {
-                        states[0] = StarUtil.isStar(songListDetail);
-                        /**
-                         * 如果正在播放音乐并且是本歌单，则显示正在播放，否则显示未播放
-                         */
-                        states[1] = true;
-                        /*states[1] = MUSIC_PLAY_MANAGER.isPlaying() && MUSIC_PLAY_MANAGER.isSameList(songListDetail.getId());*/
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Object>() {
-                    @Override
-                    public void accept(Object o) throws Exception {
-                        viewWrapper.starImageView().setImageResource(states[0] ? R.drawable.ic_star_32dp : R.drawable.ic_star_32dp_default);
-                        viewWrapper.playImageView().setImageResource(states[1] ? R.drawable.ic_pause : R.drawable.ic_play);
-                    }
-                });
-
-        /**
-         * 如果歌单已star，则unStar后设置checkBox check false
-         * 反之亦然
-         */
-        RxView.clicks(viewWrapper.starImageView())
-                .compose(this.bindToLifecycle())
-                .observeOn(Schedulers.io())
-                .map(new Function<Object, Boolean>() {
-                    @Override
-                    public Boolean apply(Object o) throws Exception {
-                        boolean result = states[0] ? StarUtil.unStar(songListDetail) : StarUtil.star(songListDetail);
-                        states[0] = result ? !states[0] : states[0];
-                        return states[0];
+                    public Boolean apply(DouBanFMSongListDetail detail) throws Exception {
+                        return StarUtil.isStar(songListDetail);
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -187,28 +160,116 @@ public class DouBanFMSongListActivity extends BaseActivity {
                 });
 
         /**
-         * 如果显示播放状态，则一定是在播放本列表歌曲，点击暂停
-         * 如果显示未播放状态，且在播放别列表歌曲，则切换到本歌单
-         *                  若在播放的歌曲是本歌单歌曲，则继续播放
+         * 如果歌单已star，则unStar后设置checkBox check false
+         * 反之亦然
          */
-        RxView.clicks(viewWrapper.playImageView())
+        RxView.clicks(viewWrapper.starImageView())
                 .compose(this.bindToLifecycle())
-                .subscribe(new Consumer<Object>() {
+                .doOnNext(new Consumer<Object>() {
                     @Override
                     public void accept(Object o) throws Exception {
-                        /*if (states[1]) {
-                            MUSIC_PLAY_MANAGER.pause();
+                        viewWrapper.starImageView().setEnabled(false);
+                    }
+                })
+                .observeOn(Schedulers.io())
+                .map(new Function<Object, Boolean>() {
+                    @Override
+                    public Boolean apply(Object o) throws Exception {
+                        boolean isStar = StarUtil.isStar(songListDetail);
+                        if (isStar) {
+                            StarUtil.unStar(songListDetail);
                         } else {
-                            if (MUSIC_PLAY_MANAGER.isPausing() && MUSIC_PLAY_MANAGER.isSameList(songListDetail.getId())) {
-                                MUSIC_PLAY_MANAGER.replay();
-                            } else {
-                                MUSIC_PLAY_MANAGER.playList(songListDetail);
-                            }
-                        }*/
-                        states[1] = !states[1];
-                        viewWrapper.playImageView().setImageResource(states[1] ? R.drawable.ic_pause : R.drawable.ic_play);
+                            StarUtil.star(songListDetail);
+                        }
+                        return !isStar;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean isStar) throws Exception {
+                        viewWrapper.starImageView().setEnabled(true);
+                        viewWrapper.starImageView().setImageResource(isStar ? R.drawable.ic_star_32dp : R.drawable.ic_star_32dp_default);
                     }
                 });
+
+        /**
+         * 加入歌单并播放，如果歌单是本歌单，那么不做任何动作
+         *
+         */
+        RxView.clicks(viewWrapper.playImageView())
+                .throttleFirst(1, TimeUnit.SECONDS)
+                .compose(DouBanFMSongListActivity.this.bindToLifecycle())
+                .observeOn(Schedulers.io())
+                .flatMap(new Function<Object, ObservableSource<Intent>>() {
+
+                    @Override
+                    public ObservableSource<Intent> apply(Object o) throws Exception {
+                        return new MusicPlayHelper()
+                                .list()
+                                .observe()
+                                .compose(DouBanFMSongListActivity.this.<Intent>bindToLifecycle());
+                    }
+                })
+                .map(new Function<Intent, Boolean>() {
+                    @Override
+                    public Boolean apply(Intent intent) throws Exception {
+
+                        List<DouBanFMSongListDetail.Song> list = (List<DouBanFMSongListDetail.Song>) intent.getSerializableExtra("list");
+                        if (list == null || list.size() == 0) {
+                            return false;
+                        }
+                        List<DouBanFMSongListDetail.Song> localList = songListDetail.getSongs();
+                        if (list.size() != localList.size()) {
+                            return false;
+                        }
+                        for (int i = 0; i < list.size(); i++) {
+                            boolean sameSong = list.get(i).getSid().equals(localList.get(i).getSid());
+                            if (!sameSong) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                })
+                .filter(new Predicate<Boolean>() {
+                    @Override
+                    public boolean test(Boolean isSameList) throws Exception {
+                        LogUtil.e(isSameList + "");
+                        return isSameList == null || !isSameList;
+                    }
+                })
+                .flatMap(new Function<Object, ObservableSource<Intent>>() {
+
+                    @Override
+                    public ObservableSource<Intent> apply(Object o) throws Exception {
+                        return new MusicPlayHelper()
+                                .clear()
+                                .add(songListDetail.getSongs())
+                                .to(0)
+                                .observe()
+                                .compose(DouBanFMSongListActivity.this.<Intent>bindToLifecycle());
+                    }
+                })
+                .filter(new Predicate<Intent>() {
+                    @Override
+                    public boolean test(Intent intent) throws Exception {
+                        return intent.getAction().equals(MusicPlayService.ACTION_TO);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Intent>() {
+                    @Override
+                    public void accept(Intent intent) throws Exception {
+                        ToastUtils.showShortToast("正在播放：" + songListDetail.getSongs().get(0).getTitle());
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        ToastUtils.showShortToast(throwable.getMessage());
+                    }
+                });
+
         //@TODO 分享和下载的逻辑未做
     }
 
@@ -270,28 +331,33 @@ public class DouBanFMSongListActivity extends BaseActivity {
             viewModel.bind(detail.getSongs().get(position));
 
             /**
-             * 这段逻辑有点问题，执行起来不是同步的
+             * 点击条目将歌单加入并播放当前位置的歌曲
              */
             RxView.clicks(view.rootView())
                     .compose(activity.get().bindToLifecycle())
                     .throttleFirst(1, TimeUnit.SECONDS)
                     .observeOn(Schedulers.io())
-                    .concatMap(new Function<Object, ObservableSource<Boolean>>() {
+                    .flatMap(new Function<Object, ObservableSource<Intent>>() {
                         @Override
-                        public ObservableSource<Boolean> apply(Object o) throws Exception {
-                            return MusicPlayManager.clear();
+                        public ObservableSource<Intent> apply(Object o) throws Exception {
+                            return new MusicPlayHelper()
+                                    .clear()
+                                    .add(detail.getSongs())
+                                    .to(position)
+                                    .observe()
+                                    .compose(activity.get().<Intent>bindToLifecycle());
                         }
                     })
-                    .concatMap(new Function<Boolean, ObservableSource<Boolean>>() {
+                    .filter(new Predicate<Intent>() {
                         @Override
-                        public ObservableSource<Boolean> apply(Boolean aBoolean) throws Exception {
-                            return MusicPlayManager.add(detail.getSongs());
+                        public boolean test(Intent intent) throws Exception {
+                            return intent.getAction().equals(MusicPlayService.ACTION_TO);
                         }
                     })
-                    .concatMap(new Function<Boolean, ObservableSource<DouBanFMSongListDetail.Song>>() {
+                    .map(new Function<Intent, DouBanFMSongListDetail.Song>() {
                         @Override
-                        public ObservableSource<DouBanFMSongListDetail.Song> apply(Boolean aBoolean) throws Exception {
-                            return MusicPlayManager.to(position);
+                        public DouBanFMSongListDetail.Song apply(Intent intent) throws Exception {
+                            return (DouBanFMSongListDetail.Song) intent.getSerializableExtra("song");
                         }
                     })
                     .observeOn(AndroidSchedulers.mainThread())
@@ -303,6 +369,9 @@ public class DouBanFMSongListActivity extends BaseActivity {
                         }
                     });
 
+            /**
+             * 点击更多弹出选项框
+             */
             RxView.clicks(view.moreImageView())
                     .compose(activity.get().bindToLifecycle())
                     .throttleFirst(1, TimeUnit.SECONDS)
@@ -377,6 +446,7 @@ public class DouBanFMSongListActivity extends BaseActivity {
                         viewWrapper.starImageView().setImageResource(isStar ? R.drawable.ic_star_32dp : R.drawable.ic_star_32dp_default);
                     }
                 });
+
         popupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
         popupWindow.setFocusable(true);
         popupWindow.setOutsideTouchable(true);

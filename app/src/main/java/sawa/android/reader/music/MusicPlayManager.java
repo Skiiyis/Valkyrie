@@ -15,8 +15,8 @@ import io.reactivex.schedulers.Schedulers;
 import sawa.android.musicplay.constants.MusicPlayMode;
 import sawa.android.reader.douban.bean.DouBanFMSongListDetail;
 import sawa.android.reader.global.Application;
-import sawa.android.reader.util.BroadcastUtil;
-import sawa.android.reader.util.LogUtil;
+import sawa.android.common.util.BroadcastUtil;
+import sawa.android.common.util.LogUtil;
 
 /**
  * Created by mc100 on 2017/5/3.
@@ -140,7 +140,7 @@ public class MusicPlayManager {
                             @Override
                             public void onReceive(Context context, Intent intent) {
                                 e.onNext(true);
-                                LogUtil.e("receiverAdd(" + System.currentTimeMillis() +"):true");
+                                LogUtil.e("receiverAdd(" + System.currentTimeMillis() + "):true");
                             }
                         }, MusicPlayService.ACTION_ADD);
 
@@ -162,7 +162,7 @@ public class MusicPlayManager {
                             @Override
                             public void onReceive(Context context, Intent intent) {
                                 e.onNext(true);
-                                LogUtil.e("receiverClear(" + System.currentTimeMillis() +"):true");
+                                LogUtil.e("receiverClear(" + System.currentTimeMillis() + "):true");
                             }
                         }, MusicPlayService.ACTION_CLEAR);
                         LogUtil.e("clear(" + System.currentTimeMillis() + ")");

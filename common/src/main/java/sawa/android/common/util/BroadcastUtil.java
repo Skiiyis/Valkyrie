@@ -1,4 +1,4 @@
-package sawa.android.reader.util;
+package sawa.android.common.util;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import sawa.android.reader.global.Application;
+import sawa.android.common.global.Application;
 
 /**
  * Created by mc100 on 2017/5/3.

@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 
-import com.trello.rxlifecycle2.android.ActivityEvent;
-
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
@@ -18,7 +16,7 @@ import sawa.android.reader.webview.WebViewActivity;
 import sawa.android.reader.global.Application;
 import sawa.android.reader.http.ZhiHuApi;
 import sawa.android.reader.util.CacheUtil;
-import sawa.android.reader.util.LogUtil;
+import sawa.android.common.util.LogUtil;
 import sawa.android.reader.zhihu.bean.ZhiHuNewsDetailResponse;
 
 /**

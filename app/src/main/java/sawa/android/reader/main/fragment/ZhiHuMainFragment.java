@@ -17,7 +17,7 @@ import sawa.android.reader.main.adapter.ZhiHuViewAdapter;
 import sawa.android.reader.main.bean.ZhiHuNewsLatestResponse;
 import sawa.android.reader.main.view_wrapper.ViewRecycleViewWrapper;
 import sawa.android.reader.util.CacheUtil;
-import sawa.android.reader.util.LogUtil;
+import sawa.android.common.util.LogUtil;
 
 /**
  * Created by hasee on 2017/3/11.

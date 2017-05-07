@@ -28,7 +28,7 @@ import sawa.android.reader.main.view_model.DouBanFMViewModel;
 import sawa.android.reader.main.view_wrapper.DouBanFMViewWrapper;
 import sawa.android.reader.main.view_wrapper.ViewRecycleViewWrapper;
 import sawa.android.reader.util.CacheUtil;
-import sawa.android.reader.util.LogUtil;
+import sawa.android.common.util.LogUtil;
 
 /**
  * Created by hasee on 2017/3/26.

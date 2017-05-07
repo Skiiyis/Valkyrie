@@ -12,8 +12,7 @@ import sawa.android.musicplay.AbsMusicPlayer;
 import sawa.android.musicplay.constants.MusicPlayMode;
 import sawa.android.musicplay.inter.IMusicPlay;
 import sawa.android.reader.douban.bean.DouBanFMSongListDetail;
-import sawa.android.reader.util.BroadcastUtil;
-import sawa.android.reader.util.LogUtil;
+import sawa.android.common.util.BroadcastUtil;
 
 /**
  * Created by mc100 on 2017/4/14.
@@ -77,7 +76,6 @@ public class MusicPlayService extends Service implements IMusicPlay<DouBanFMSong
                 BroadcastUtil.global().sendBroadcast(ACTION_STOP);
                 break;
             case ACTION_ADD:
-                LogUtil.e("add:" + System.currentTimeMillis());
                 List<DouBanFMSongListDetail.Song> songs = (List<DouBanFMSongListDetail.Song>) intent.getSerializableExtra("songList");
                 if (songs != null && songs.size() != 0) {
                     add(songs);
@@ -85,7 +83,7 @@ public class MusicPlayService extends Service implements IMusicPlay<DouBanFMSong
                 }
                 break;
             case ACTION_CLEAR:
-                LogUtil.e("clear:" + System.currentTimeMillis());
+                clear();
                 BroadcastUtil.global().sendBroadcast(ACTION_CLEAR);
                 break;
             case ACTION_NEXT:
@@ -97,9 +95,8 @@ public class MusicPlayService extends Service implements IMusicPlay<DouBanFMSong
                 BroadcastUtil.global().sendBroadcast(new Intent(ACTION_NEXT).putExtra("song", prev));
                 break;
             case ACTION_TO:
-                LogUtil.e("to:" + System.currentTimeMillis());
                 int toPosition = intent.getIntExtra("to", -1);
-                if (toPosition != -1 && toPosition > 0) {
+                if (toPosition != -1) {
                     DouBanFMSongListDetail.Song to = to(toPosition);
                     BroadcastUtil.global().sendBroadcast(new Intent(ACTION_TO).putExtra("song", to));
                 }
@@ -199,4 +196,5 @@ public class MusicPlayService extends Service implements IMusicPlay<DouBanFMSong
     public String status() {
         return musicPlayer.status();
     }
+
 }
