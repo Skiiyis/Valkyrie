@@ -5,11 +5,9 @@ import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.blankj.utilcode.utils.ToastUtils;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 
 import sawa.android.reader.R;
@@ -18,14 +16,6 @@ import sawa.android.reader.R;
  * Created by hasee on 2017/3/8.
  */
 public abstract class BaseActivity extends RxAppCompatActivity {
-
-    public void showToast(String msg) {
-        ToastUtils.showShortToast(msg);
-    }
-
-    public <T extends View> T findView(int id) {
-        return (T) findViewById(id);
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

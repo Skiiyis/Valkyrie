@@ -3,6 +3,8 @@ package sawa.android.common.util;
 import android.app.Activity;
 import android.view.View;
 
+import sawa.android.common.activityInterceptor.TopActivityInterceptor;
+
 /**
  * Created by mc100 on 2017/4/28.
  */
@@ -23,5 +25,9 @@ public class ActivityUtil {
 
             return (Activity) targetView.getContext();
         }
+    }
+
+    public static Activity getTopActivity() {
+        return TopActivityInterceptor.getTopActivity();
     }
 }

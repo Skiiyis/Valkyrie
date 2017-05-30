@@ -39,6 +39,10 @@
             android:name=".maxjia.activity.LiveDetailActivity"
             android:label="@string/title_activity_live_detail"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".about.AboutActivity"
+            android:label="@string/title_activity_about"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

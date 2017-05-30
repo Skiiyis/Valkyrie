@@ -2,6 +2,8 @@ package sawa.android.common.global;
 
 import android.content.Context;
 
+import sawa.android.common.activityInterceptor.TopActivityInterceptor;
+
 /**
  * Created by hasee on 2017/3/8.
  */
@@ -13,6 +15,7 @@ public class Application extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         this.context = this;
+        registerActivityLifecycleCallbacks(new TopActivityInterceptor());
     }
 
     public static Context get() {

@@ -8,12 +8,14 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import sawa.android.reader.R;
+import sawa.android.reader.about.AboutActivity;
 import sawa.android.reader.common.BaseActivity;
 import sawa.android.reader.main.fragment.DouBanFMMainFragment;
 import sawa.android.reader.main.fragment.LiveMainFragment;
@@ -70,11 +72,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mainActivityViewWrapper.containerViewPager().addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                /*
-                int[] color = new int[]{colors[0], ColorUtil.centerColor(colors[0], colors[1], positionOffsetPixels)};
-                ColorStateList colorStateList = new ColorStateList(states, color);
-                ((RadioButton) mainActivityViewWrapper.buttonRadioGroup().getChildAt(currentChecked)).setCompoundDrawableTintList(colorStateList);
-                */
             }
 
             @Override
@@ -89,11 +86,38 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             }
         });
         mainActivityViewWrapper.containerViewPager().setOffscreenPageLimit(3);
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.nav_about:
+                        AboutActivity.launch(MainActivity.this);
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+        });
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return false;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.nav_about:
+                AboutActivity.launch(this);
+                break;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
